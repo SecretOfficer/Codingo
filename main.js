@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain, shell, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, shell, dialog, Menu } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
@@ -44,24 +44,91 @@ const DEFAULT_STATE = {
   seenIntro: false
 };
 
+function backupFile() {
+  return progressFile() + '.bak';
+}
+
+function readJson(file) {
+  const raw = fs.readFileSync(file, 'utf8');
+  const parsed = JSON.parse(raw);
+  if (!parsed || typeof parsed !== 'object') throw new Error('not an object');
+  return parsed;
+}
+
+/** Load progress, falling back to the last good backup if the main file is damaged. */
 function loadState() {
   try {
-    const raw = fs.readFileSync(progressFile(), 'utf8');
-    return Object.assign({}, DEFAULT_STATE, JSON.parse(raw));
+    return Object.assign({}, DEFAULT_STATE, readJson(progressFile()));
   } catch (err) {
-    return Object.assign({}, DEFAULT_STATE);
+    if (err.code !== 'ENOENT') console.error('progress unreadable, trying backup:', err.message);
+    try {
+      const recovered = Object.assign({}, DEFAULT_STATE, readJson(backupFile()));
+      console.warn('recovered progress from backup');
+      return recovered;
+    } catch (err2) {
+      return Object.assign({}, DEFAULT_STATE);
+    }
   }
 }
 
+/**
+ * Write progress atomically: a half-written file after a crash or power cut would
+ * otherwise wipe a learner's history. Temp file first, keep the previous copy as a
+ * backup, then rename over the real one.
+ */
 function saveState(state) {
+  const target = progressFile();
+  const tmp = target + '.tmp';
   try {
-    fs.mkdirSync(path.dirname(progressFile()), { recursive: true });
-    fs.writeFileSync(progressFile(), JSON.stringify(state, null, 2), 'utf8');
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.writeFileSync(tmp, JSON.stringify(state, null, 2), 'utf8');
+    if (fs.existsSync(target)) {
+      try { fs.copyFileSync(target, backupFile()); } catch (err) { /* backup is best effort */ }
+    }
+    fs.renameSync(tmp, target);
     return true;
   } catch (err) {
     console.error('save failed', err);
+    try { fs.unlinkSync(tmp); } catch (err2) { /* nothing to clean */ }
     return false;
   }
+}
+
+/* ------------------------------------------------------- window bounds */
+
+function boundsFile() {
+  return path.join(app.getPath('userData'), 'window.json');
+}
+
+function loadBounds() {
+  try {
+    const b = readJson(boundsFile());
+    if (typeof b.width !== 'number' || typeof b.height !== 'number') return null;
+    return b;
+  } catch (err) {
+    return null;
+  }
+}
+
+function saveBounds(win) {
+  if (!win || win.isDestroyed()) return;
+  try {
+    const bounds = win.isMaximized() || win.isFullScreen() ? win.getNormalBounds() : win.getBounds();
+    fs.writeFileSync(boundsFile(), JSON.stringify(
+      Object.assign({}, bounds, { maximized: win.isMaximized() }), null, 2), 'utf8');
+  } catch (err) { /* window position is not worth an error dialog */ }
+}
+
+/** Keep the restored window on a screen that actually exists right now. */
+function visibleBounds(saved) {
+  if (!saved) return null;
+  const { screen } = require('electron');
+  const area = screen.getDisplayMatching(saved).workArea;
+  const width = Math.min(saved.width, area.width);
+  const height = Math.min(saved.height, area.height);
+  const x = Math.min(Math.max(saved.x, area.x), area.x + area.width - width);
+  const y = Math.min(Math.max(saved.y, area.y), area.y + area.height - height);
+  return { x, y, width, height, maximized: !!saved.maximized };
 }
 
 /* ----------------------------------------------------------- python probe */
@@ -240,40 +307,153 @@ ipcMain.handle('report:export', async (_e, payload) => {
 /* ------------------------------------------------------------------ window */
 
 function createWindow() {
-  mainWindow = new BrowserWindow({
+  const saved = visibleBounds(loadBounds());
+
+  mainWindow = new BrowserWindow(Object.assign({
     width: 1180,
     height: 820,
     minWidth: 900,
     minHeight: 640,
     backgroundColor: '#0f1420',
     title: 'Codingo',
+    icon: path.join(__dirname, 'build', 'icon.png'),
     show: false,
     autoHideMenuBar: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: false
+      sandbox: false,
+      spellcheck: false
     }
-  });
+  }, saved ? { x: saved.x, y: saved.y, width: saved.width, height: saved.height } : {}));
+
+  if (saved && saved.maximized) mainWindow.maximize();
 
   mainWindow.loadFile(path.join(__dirname, 'src', 'index.html'));
   mainWindow.once('ready-to-show', () => mainWindow.show());
   if (isDev) mainWindow.webContents.openDevTools({ mode: 'detach' });
 
+  let boundsTimer = null;
+  const rememberBounds = () => {
+    clearTimeout(boundsTimer);
+    boundsTimer = setTimeout(() => saveBounds(mainWindow), 400);
+  };
+  mainWindow.on('resize', rememberBounds);
+  mainWindow.on('move', rememberBounds);
+  mainWindow.on('close', () => { clearTimeout(boundsTimer); saveBounds(mainWindow); });
+
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
     if (/^https?:\/\//i.test(url)) shell.openExternal(url);
     return { action: 'deny' };
   });
+
+  // The window only ever shows the bundled page; anything else is a bug or an attack.
+  mainWindow.webContents.on('will-navigate', (event, url) => {
+    if (!url.startsWith('file://')) {
+      event.preventDefault();
+      if (/^https?:\/\//i.test(url)) shell.openExternal(url);
+    }
+  });
+
+  mainWindow.webContents.on('render-process-gone', (_e, details) => {
+    dialog.showErrorBox('Codingo stopped responding',
+      'The window closed unexpectedly (' + details.reason + '). Your progress was saved after the last answer.');
+  });
 }
 
-app.whenReady().then(() => {
-  createWindow();
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
-  });
+/* -------------------------------------------------------------- menu */
+
+function buildMenu() {
+  const template = [
+    {
+      label: 'File',
+      submenu: [
+        { label: 'Export progress report…', click: () => mainWindow && mainWindow.webContents.send('menu:export') },
+        { type: 'separator' },
+        { role: process.platform === 'darwin' ? 'close' : 'quit' }
+      ]
+    },
+    {
+      label: 'View',
+      submenu: [
+        { role: 'resetZoom' },
+        { role: 'zoomIn' },
+        { role: 'zoomOut' },
+        { type: 'separator' },
+        { role: 'togglefullscreen' },
+        ...(isDev ? [{ type: 'separator' }, { role: 'reload' }, { role: 'toggleDevTools' }] : [])
+      ]
+    },
+    {
+      label: 'Help',
+      submenu: [
+        { label: 'Keyboard shortcuts', click: () => mainWindow && mainWindow.webContents.send('menu:shortcuts') },
+        { label: 'Open data folder', click: () => shell.openPath(app.getPath('userData')) },
+        { type: 'separator' },
+        {
+          label: 'About Codingo',
+          click: () => {
+            dialog.showMessageBox(mainWindow, {
+              type: 'info',
+              title: 'About Codingo',
+              message: 'Codingo ' + app.getVersion(),
+              detail: [
+                'Gamified e-learning for STEM and coding.',
+                '',
+                'Electron ' + process.versions.electron + '  ·  Chromium ' + process.versions.chrome,
+                'Node ' + process.versions.node,
+                'Python: ' + (findPython() ? findPython().cmd + ' found' : 'not found'),
+                '',
+                'Runs offline. No account, no telemetry, no network calls.'
+              ].join('\n'),
+              buttons: ['Close']
+            });
+          }
+        }
+      ]
+    }
+  ];
+  Menu.setApplicationMenu(Menu.buildFromTemplate(template));
+}
+
+ipcMain.handle('app:info', () => ({
+  version: app.getVersion(),
+  electron: process.versions.electron,
+  chrome: process.versions.chrome,
+  node: process.versions.node,
+  platform: process.platform,
+  dataPath: app.getPath('userData'),
+  python: findPython() ? findPython().cmd : null
+}));
+
+ipcMain.handle('app:recheckPython', () => {
+  pythonCmd = undefined;          // forget the cached probe and look again
+  return !!findPython();
 });
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') app.quit();
-});
+/* -------------------------------------------------------------- start */
+
+// A second copy would fight the first over the same progress file.
+const gotLock = app.requestSingleInstanceLock();
+if (!gotLock) {
+  app.quit();
+} else {
+  app.on('second-instance', () => {
+    if (!mainWindow) return;
+    if (mainWindow.isMinimized()) mainWindow.restore();
+    mainWindow.focus();
+  });
+
+  app.whenReady().then(() => {
+    buildMenu();
+    createWindow();
+    app.on('activate', () => {
+      if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    });
+  });
+
+  app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') app.quit();
+  });
+}

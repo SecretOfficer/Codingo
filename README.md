@@ -13,6 +13,23 @@ npm start
 `npm run dev` starts the same app with DevTools open. Python is optional but recommended: it powers the
 write-code exercises and the Python sandbox lab.
 
+## Building a release
+
+```bash
+npm run verify        # 2300+ checks over every exercise, lab, duel problem and the rating engine
+npm run icon          # regenerate build/icon.png (no image tools needed)
+npm run dist:win      # NSIS installer + portable exe into release/
+npm run dist:zip      # zip build that needs no code-signing tools
+npm run pack          # unpacked app in release/win-unpacked for quick testing
+```
+
+Pushing a `v*` tag runs `.github/workflows/release.yml`, which verifies the content on Linux, builds the
+Windows installer, and attaches the artifacts to a GitHub release.
+
+On a Windows machine without Developer Mode, `dist:win` can fail while unpacking electron-builder's
+code-signing tools (it contains macOS symlinks). `npm run dist:zip` avoids that path; CI builds the
+installer properly.
+
 ## What is inside
 
 **Five subjects, 72 lessons, ~340 authored exercises.**
@@ -47,6 +64,19 @@ every screen:
 The coding track is laid out as five themed worlds from the pitch — **Syntax Sands, Logic Lagoon,
 Structure Steppes, Algorithm Ascent, Architect's Apex** — each with a progress ring over the lessons it
 contains.
+
+**Game feel.** Every correct answer fires a particle burst, a floating `+XP` number that flies toward the
+counter, and a synthesised chime whose pitch climbs with your combo; a wrong answer shakes the screen,
+flashes red and plays a falling tone. Finishing a lesson drops confetti, a flawless run slams `FLAWLESS`
+across the screen, and duels open with a 3-2-1-FIGHT countdown and end on `VICTORY` confetti or a hard
+screen shake. No audio or image files ship with the app: every sound is generated with a Web Audio
+oscillator at play time and every effect is drawn on one overlay canvas. Sound and animation each have an
+off switch in Settings.
+
+**22 badges** unlock as you play — first lesson, flawless run, x2 combo, ten speed bonuses, a seven-day
+streak, a lesson in every subject, every lab cleared, a Debug Duel win, Diamond tier, beating an opponent
+rated 200 points above you, and more. Each is worth 20 gems and they are all listed, locked and unlocked,
+at the bottom of the Progress tab.
 
 Game mechanics: five hearts (one lost per miss, refilled next day or for 100 gems), three crowns per
 lesson, gems, a daily XP goal and a day streak. XP per answer is live-multiplied by a **combo**: three
@@ -141,7 +171,11 @@ src/styles.css       all styling, including high-contrast and reduced-motion mod
 src/app.js           renderer: routing, worlds path, lesson engine, labs shell, dashboard, SDG page
 src/arena-ui.js      renderer: rank card, queue, the three duel screens, leaderboard
 src/labs.js          the six simulations: parameters, physics/chemistry/maths, drawing, challenges
+src/juice.js         synthesised sound, particles, floating numbers, shakes and slams
+src/achievements.js  the 22 badges, each a pure predicate over saved state
 src/course/          content, one file per subject, plus an index that adds unit reviews and worlds
+scripts/verify.js    the content gate run by CI before any build
+scripts/make-icon.js draws build/icon.png from scratch and encodes the PNG by hand
 ```
 
 Progress is stored as JSON in Electron's `userData` directory and can be wiped from Settings.

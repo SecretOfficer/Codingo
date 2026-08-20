@@ -29,7 +29,17 @@ const MODES = [
 ];
 
 export function createArena(ctx) {
-  const { esc, view, api, toast } = ctx;
+  const { esc, view, api, toast, fx } = ctx;
+
+  /** The 3 - 2 - 1 - FIGHT beat before a duel starts. */
+  function countdown() {
+    return new Promise((resolve) => {
+      const beats = ['3', '2', '1'];
+      beats.forEach((b, i) => setTimeout(() => { fx.slam(b, '#eaf0fb'); fx.play('countdown'); }, i * 600));
+      setTimeout(() => { fx.slam('FIGHT', '#ff4b4b'); fx.play('go'); }, beats.length * 600);
+      setTimeout(resolve, beats.length * 600 + 500);
+    });
+  }
   let live = null;   // the duel currently on screen
 
   const S = () => ctx.state();
@@ -262,6 +272,8 @@ export function createArena(ctx) {
           statusEl.innerHTML = `Matched with <b>${esc(opp.name)}</b> &mdash; ${Math.round(opp.rating)}`;
           statusEl.classList.add('found');
         }
+        fx.play('go');
+        fx.burstAt(document.querySelector('.queue-radar'), { count: 30, speed: 6 });
         setTimeout(() => beginDuel(mode, opp), 1100);
       }
     }, 300);
@@ -280,6 +292,7 @@ export function createArena(ctx) {
 
     const problem = await api.arena.problem(mode.id, target, a.solvedProblems || []);
     const sim = await api.arena.simOpponent(opponent, problem.difficulty, problem.limitSeconds);
+    await countdown();
 
     live = {
       mode,
@@ -446,6 +459,7 @@ export function createArena(ctx) {
   }
 
   async function startRapidDuel(mode, opponent) {
+    await countdown();
     const a = A();
     const questions = rapidQuestions(6);
     const skill = (opponent.rating - 800) / 1800;
@@ -572,6 +586,13 @@ export function createArena(ctx) {
     const footer = document.getElementById('footer');
     const msg = document.getElementById('footer-msg');
     footer.classList.add(correct ? 'ok' : 'no');
+    if (correct) {
+      fx.play('correct');
+      fx.burstAt(document.querySelector('.duel-side.me'), { count: 16, up: true });
+    } else {
+      fx.play('wrong');
+      fx.shake('soft');
+    }
     msg.innerHTML = `<div class="footer-title">${correct ? 'Correct in ' + elapsed.toFixed(1) + 's' : (timedOut ? 'Out of time' : 'Wrong')}</div>
       <div class="footer-why">${esc(ex.explain || '')}</div>
       <div class="footer-why">${esc(live.opponent.name)} ${oppCorrect ? 'answered correctly in ' + plan.at.toFixed(1) + 's' : 'got it wrong'}.</div>`;
@@ -646,6 +667,22 @@ export function createArena(ctx) {
     const st = await api.arena.standings(a.pool, a.player);
     const justPlaced = a.placed && a.placements === PLACEMENT_DUELS;
 
+    a.lastTier = st.tier.id;
+    const beatStronger = result === 'win' && live.opponent.rating - before >= 200;
+    await ctx.save();
+
+    if (result === 'win') {
+      fx.play('victory');
+      fx.confetti(150);
+      fx.slam('VICTORY', '#58cc02');
+    } else if (result === 'loss') {
+      fx.play('defeat');
+      fx.shake('hard');
+      fx.flash('rgba(255,75,75,.25)');
+    } else {
+      fx.play('complete');
+    }
+
     view.innerHTML = `
       <div class="center-screen">
         <div class="result-banner ${result}">${result === 'win' ? 'VICTORY' : result === 'loss' ? 'DEFEAT' : 'DRAW'}</div>
@@ -672,6 +709,7 @@ export function createArena(ctx) {
     live = null;
     document.getElementById('btn-arena').onclick = renderArena;
     document.getElementById('btn-again').onclick = () => startQueue(mode.id);
+    ctx.checkBadges({ giantKiller: beatStronger });
   }
 
   return { renderArena, renderLadder, leave, MODES, PLACEMENT_DUELS };

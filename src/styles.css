@@ -989,6 +989,135 @@ pre.console .err { color: var(--red); }
 .fact-k { width: 160px; flex: none; color: var(--muted); }
 .fact-v { flex: 1; }
 
+/* ---------------------------------------------------------- game feel */
+
+#fx-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 70;
+}
+
+.float-text {
+  position: fixed;
+  transform: translate(-50%, 0);
+  font-weight: 800;
+  font-size: 22px;
+  color: var(--green);
+  pointer-events: none;
+  z-index: 72;
+  opacity: 1;
+  transition: transform .95s cubic-bezier(.2, .8, .3, 1), opacity .95s ease;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, .6);
+}
+.float-text.xp { color: var(--gold); }
+.float-text.go { transform: translate(-50%, -110px) scale(1.25); opacity: 0; }
+
+.fx-flash {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 68;
+  opacity: 0;
+  transition: opacity .12s ease-out;
+}
+.fx-flash.go { opacity: 1; animation: flash-out .4s forwards; }
+@keyframes flash-out { 0% { opacity: 1; } 100% { opacity: 0; } }
+
+.fx-slam {
+  position: fixed;
+  left: 50%;
+  top: 38%;
+  transform: translate(-50%, -50%) scale(2.6);
+  font-size: 68px;
+  font-weight: 800;
+  letter-spacing: 6px;
+  color: #eaf0fb;
+  pointer-events: none;
+  z-index: 74;
+  opacity: 0;
+  text-shadow: 0 6px 30px rgba(0, 0, 0, .8);
+  transition: transform .18s cubic-bezier(.2, 1.4, .4, 1), opacity .18s ease;
+}
+.fx-slam.go { transform: translate(-50%, -50%) scale(1); opacity: 1; animation: slam-out .7s forwards; }
+@keyframes slam-out {
+  0%, 55% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -70%) scale(1.15); }
+}
+
+@keyframes shake-soft-kf {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-7px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(3px); }
+}
+@keyframes shake-hard-kf {
+  0%, 100% { transform: translate(0, 0) rotate(0); }
+  15% { transform: translate(-12px, 4px) rotate(-.5deg); }
+  30% { transform: translate(11px, -5px) rotate(.5deg); }
+  45% { transform: translate(-9px, 3px) rotate(-.4deg); }
+  60% { transform: translate(7px, -2px) rotate(.3deg); }
+  80% { transform: translate(-4px, 1px) rotate(0); }
+}
+body.shake-soft { animation: shake-soft-kf .35s; }
+body.shake-hard { animation: shake-hard-kf .42s; }
+
+/* badges */
+
+.badge-toast {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  background: linear-gradient(100deg, rgba(255, 200, 0, .22), var(--bg-2) 65%);
+  border: 2px solid var(--gold);
+  border-radius: 16px;
+  padding: 14px 18px;
+  z-index: 76;
+  transform: translateX(120%);
+  transition: transform .4s cubic-bezier(.2, .9, .3, 1);
+  max-width: 380px;
+}
+.badge-toast.in { transform: translateX(0); }
+.bt-icon {
+  width: 48px; height: 48px;
+  flex: none;
+  border-radius: 12px;
+  background: var(--gold);
+  color: #08111f;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-weight: 800; font-size: 15px;
+}
+.bt-kicker { font-size: 10.5px; letter-spacing: 1.4px; text-transform: uppercase; color: var(--gold); font-weight: 800; }
+.bt-name { font-size: 17px; font-weight: 800; margin-top: 2px; }
+.bt-desc { color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+
+.badge-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.badge {
+  border: 2px solid var(--line);
+  border-radius: 14px;
+  padding: 12px;
+  text-align: center;
+  background: var(--bg-3);
+}
+.badge.owned { border-color: var(--gold); background: rgba(255, 200, 0, .08); }
+.badge.locked { opacity: .45; }
+.badge-icon {
+  width: 40px; height: 40px;
+  margin: 0 auto 8px;
+  border-radius: 11px;
+  background: var(--bg-2);
+  border: 2px solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-weight: 800; font-size: 13px;
+}
+.badge.owned .badge-icon { background: var(--gold); color: #08111f; border-color: var(--gold); }
+.badge-name { font-weight: 800; font-size: 13px; }
+.badge-desc { color: var(--muted); font-size: 11px; margin-top: 3px; line-height: 1.4; }
+
 /* ------------------------------------------------- accessibility modes */
 
 body { zoom: var(--font-scale, 1); }
@@ -1007,6 +1136,34 @@ body.no-motion *, body.no-motion *::before, body.no-motion *::after {
   animation: none !important;
   transition: none !important;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+}
+
+/* Keyboard users get a visible focus ring; mouse users do not. */
+:focus { outline: none; }
+:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+kbd {
+  font-family: var(--mono);
+  background: var(--bg-3);
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 12.5px;
+  color: var(--text);
+}
+.shortcut-what { font-weight: 400; color: var(--muted); font-size: 13px; text-align: right; }
 
 /* ------------------------------------------------- worlds, combo, bugs */
 

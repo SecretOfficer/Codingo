@@ -1,6 +1,16 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
+const MENU_EVENTS = ['menu:export', 'menu:shortcuts'];
+
 contextBridge.exposeInMainWorld('codingo', {
+  appInfo: () => ipcRenderer.invoke('app:info'),
+  recheckPython: () => ipcRenderer.invoke('app:recheckPython'),
+  onMenu: (handler) => {
+    MENU_EVENTS.forEach((channel) => {
+      ipcRenderer.removeAllListeners(channel);
+      ipcRenderer.on(channel, () => handler(channel));
+    });
+  },
   loadState: () => ipcRenderer.invoke('state:load'),
   saveState: (state) => ipcRenderer.invoke('state:save', state),
   resetState: () => ipcRenderer.invoke('state:reset'),

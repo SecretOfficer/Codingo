@@ -210,7 +210,7 @@ export default {
         {
           type: 'match',
           q: 'Match each built-in with what it does.',
-          pairs: [['abs(-3)', '3'], ['max([1, 9])', '9'], ['sorted("ba")', "['a', 'b']"], ['len("abc")', '3']],
+          pairs: [['abs(-3)', '3'], ['max([1, 9])', '9'], ['sorted("ba")', "['a', 'b']"], ['min([4, 2])', '2']],
           explain: 'sorted() always returns a list, even when the input is a string.'
         },
         {

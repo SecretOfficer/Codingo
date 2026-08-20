@@ -51,8 +51,8 @@ export default {
         {
           type: 'match',
           q: 'Match each list operation with its result on [1, 2, 3].',
-          pairs: [['len(x)', '3'], ['x[-1]', '3'], ['sum(x)', '6'], ['x + [4]', '[1, 2, 3, 4]']],
-          explain: 'sum, len, min and max all work directly on lists of numbers.'
+          pairs: [['len(x)', '3'], ['sum(x)', '6'], ['x + [4]', '[1, 2, 3, 4]'], ['x * 2', '[1, 2, 3, 1, 2, 3]']],
+          explain: 'sum, len, min and max work directly on lists of numbers. + joins two lists and * repeats one.'
         }
       ]
     },

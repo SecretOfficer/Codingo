@@ -113,10 +113,26 @@ const circuitLab = {
     g.fillText(s.mode.toUpperCase() + '  |  I = ' + round(d.i, 3) + ' A', 14, h - 16);
   },
   challenges: [
-    { id: 'c1', text: 'Get the total current between 0.9 A and 1.1 A', check: (s, d) => d.i >= 0.9 && d.i <= 1.1 },
-    { id: 'c2', text: 'Wire it so the total resistance is below either single resistor', check: (s, d) => d.rt < Math.min(s.r1, s.r2) - 0.01 },
-    { id: 'c3', text: 'Make R1 and R2 drop equal voltages in series', check: (s, d) => s.mode === 'series' && Math.abs(d.v1 - d.v2) < 0.05 },
-    { id: 'c4', text: 'Draw more than 20 W from the battery', check: (s, d) => d.p > 20 }
+    {
+      id: 'c1', text: 'Get the total current between 0.9 A and 1.1 A',
+      check: (s, d) => d.i >= 0.9 && d.i <= 1.1,
+      solve: { mode: 'series', v: 12, r1: 6, r2: 6 }
+    },
+    {
+      id: 'c2', text: 'Wire it so the total resistance is below either single resistor',
+      check: (s, d) => d.rt < Math.min(s.r1, s.r2) - 0.01,
+      solve: { mode: 'parallel', v: 12, r1: 10, r2: 20 }
+    },
+    {
+      id: 'c3', text: 'Make R1 and R2 drop equal voltages in series',
+      check: (s, d) => s.mode === 'series' && Math.abs(d.v1 - d.v2) < 0.05,
+      solve: { mode: 'series', v: 12, r1: 10, r2: 10 }
+    },
+    {
+      id: 'c4', text: 'Draw more than 20 W from the battery',
+      check: (s, d) => d.p > 20,
+      solve: { mode: 'parallel', v: 24, r1: 10, r2: 10 }
+    }
   ]
 };
 
@@ -206,10 +222,26 @@ const projectileLab = {
     g2.fillText('range ' + round(d.range, 1) + ' m', 14, 22);
   },
   challenges: [
-    { id: 'c1', text: 'Land the ball within 1 m of the 45 m target', check: (s, d) => d.hit },
-    { id: 'c2', text: 'Find the angle that gives the maximum range on Earth', check: (s) => s.body.startsWith('Earth') && s.angle === 45 },
-    { id: 'c3', text: 'Reach the target on the Moon instead', check: (s, d) => s.body.startsWith('Moon') && d.hit },
-    { id: 'c4', text: 'Get a peak height above 20 m', check: (s, d) => d.peak > 20 }
+    {
+      id: 'c1', text: 'Land the ball within 1 m of the 45 m target',
+      check: (s, d) => d.hit,
+      solve: { v: 21, angle: 45, body: 'Earth 9.8' }
+    },
+    {
+      id: 'c2', text: 'Find the angle that gives the maximum range on Earth',
+      check: (s) => s.body.startsWith('Earth') && s.angle === 45,
+      solve: { v: 20, angle: 45, body: 'Earth 9.8' }
+    },
+    {
+      id: 'c3', text: 'Reach the target on the Moon instead',
+      check: (s, d) => s.body.startsWith('Moon') && d.hit,
+      solve: { v: 10, angle: 23, body: 'Moon 1.6' }
+    },
+    {
+      id: 'c4', text: 'Get a peak height above 20 m',
+      check: (s, d) => d.peak > 20,
+      solve: { v: 30, angle: 60, body: 'Earth 9.8' }
+    }
   ]
 };
 
@@ -334,10 +366,26 @@ const titrationLab = {
     g.fillText('alkali added (mL)', gx + gw / 2, gy + gh + 22);
   },
   challenges: [
-    { id: 'c1', text: 'Neutralise the acid: reach pH 7 (within 0.3)', check: (s, d) => d.neutral && s.vb > 0 },
-    { id: 'c2', text: 'Make the flask strongly acidic, below pH 2', check: (s, d) => d.ph < 2 },
-    { id: 'c3', text: 'Push it past pH 12', check: (s, d) => d.ph > 12 },
-    { id: 'c4', text: 'Neutralise using less than 30 mL of alkali', check: (s, d) => d.neutral && s.vb > 0 && s.vb < 30 }
+    {
+      id: 'c1', text: 'Neutralise the acid: reach pH 7 (within 0.3)',
+      check: (s, d) => d.neutral && s.vb > 0,
+      solve: { ca: 0.1, cb: 0.1, vb: 50 }
+    },
+    {
+      id: 'c2', text: 'Make the flask strongly acidic, below pH 2',
+      check: (s, d) => d.ph < 2,
+      solve: { ca: 0.2, cb: 0.1, vb: 0 }
+    },
+    {
+      id: 'c3', text: 'Push it past pH 12',
+      check: (s, d) => d.ph > 12,
+      solve: { ca: 0.02, cb: 0.2, vb: 100 }
+    },
+    {
+      id: 'c4', text: 'Neutralise using less than 30 mL of alkali',
+      check: (s, d) => d.neutral && s.vb > 0 && s.vb < 30,
+      solve: { ca: 0.1, cb: 0.2, vb: 25 }
+    }
   ]
 };
 
@@ -429,10 +477,26 @@ const grapherLab = {
     g.fillText('faint curve = mystery target', 12, 20);
   },
   challenges: [
-    { id: 'c1', text: 'Match the mystery curve exactly', check: (s, d) => d.matched },
-    { id: 'c2', text: 'Make a parabola that never crosses the x axis', check: (s, d) => s.a !== 0 && d.disc < 0 },
-    { id: 'c3', text: 'Make the curve touch the x axis exactly once', check: (s, d) => s.a !== 0 && Math.abs(d.disc) < 0.05 },
-    { id: 'c4', text: 'Put the vertex below y = -5 with the curve opening upward', check: (s, d) => s.a > 0 && d.vy < -5 }
+    {
+      id: 'c1', text: 'Match the mystery curve exactly',
+      check: (s, d) => d.matched,
+      solve: { a: 1, b: -2, c: -3 }
+    },
+    {
+      id: 'c2', text: 'Make a parabola that never crosses the x axis',
+      check: (s, d) => s.a !== 0 && d.disc < 0,
+      solve: { a: 1, b: 0, c: 5 }
+    },
+    {
+      id: 'c3', text: 'Make the curve touch the x axis exactly once',
+      check: (s, d) => s.a !== 0 && Math.abs(d.disc) < 0.05,
+      solve: { a: 1, b: 2, c: 1 }
+    },
+    {
+      id: 'c4', text: 'Put the vertex below y = -5 with the curve opening upward',
+      check: (s, d) => s.a > 0 && d.vy < -5,
+      solve: { a: 1, b: 0, c: -6 }
+    }
   ]
 };
 
@@ -514,10 +578,26 @@ const punnettLab = {
     g.fillText('B = dominant, b = recessive', 14, h - 16);
   },
   challenges: [
-    { id: 'c1', text: 'Produce exactly 25% recessive offspring', check: (s, d) => Math.abs(d.recessive - 25) < 0.01 },
-    { id: 'c2', text: 'Make every offspring a carrier (Bb) and none recessive', check: (s, d) => (d.counts.Bb || 0) === d.cells.length },
-    { id: 'c3', text: 'Get a 50/50 split of dominant and recessive phenotypes', check: (s, d) => Math.abs(d.recessive - 50) < 0.01 },
-    { id: 'c4', text: 'Make it impossible for any offspring to show the recessive trait, using at least one Bb parent', check: (s, d) => d.recessive === 0 && (s.p1 === 'Bb' || s.p2 === 'Bb') }
+    {
+      id: 'c1', text: 'Produce exactly 25% recessive offspring',
+      check: (s, d) => Math.abs(d.recessive - 25) < 0.01,
+      solve: { p1: 'Bb', p2: 'Bb' }
+    },
+    {
+      id: 'c2', text: 'Make every offspring a carrier (Bb) and none recessive',
+      check: (s, d) => (d.counts.Bb || 0) === d.cells.length,
+      solve: { p1: 'BB', p2: 'bb' }
+    },
+    {
+      id: 'c3', text: 'Get a 50/50 split of dominant and recessive phenotypes',
+      check: (s, d) => Math.abs(d.recessive - 50) < 0.01,
+      solve: { p1: 'Bb', p2: 'bb' }
+    },
+    {
+      id: 'c4', text: 'Make it impossible for any offspring to show the recessive trait, using at least one Bb parent',
+      check: (s, d) => d.recessive === 0 && (s.p1 === 'Bb' || s.p2 === 'Bb'),
+      solve: { p1: 'BB', p2: 'Bb' }
+    }
   ]
 };
 

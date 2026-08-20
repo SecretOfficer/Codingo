@@ -3,6 +3,8 @@ import {
 } from './course/index.js';
 import { labs, getLab, labState } from './labs.js';
 import { createArena } from './arena-ui.js';
+import * as fx from './juice.js';
+import { BADGES, evaluate, tierRank } from './achievements.js';
 
 const api = window.codingo;
 const view = document.getElementById('view');
@@ -17,6 +19,7 @@ const LAB_CHALLENGE_XP = 15;
 
 let S = null;          // persisted state
 let pythonOK = false;
+let appInfo = { version: '1.0.0' };
 let session = null;    // active lesson run
 let route = { view: 'home', arg: null };
 let labRuntime = null; // { lab, s, raf, ... }
@@ -108,7 +111,9 @@ async function initState() {
   S.subjectStats = S.subjectStats || {};
   S.history = S.history || {};
   S.labs = S.labs || {};
-  S.settings = Object.assign({ fontScale: 1, contrast: false, motion: true }, S.settings || {});
+  S.settings = Object.assign({ fontScale: 1, contrast: false, motion: true, sound: true }, S.settings || {});
+  S.badges = S.badges || [];
+  S.counters = Object.assign({ quick: 0, bestCombo: 0, labChallenges: 0 }, S.counters || {});
   S.arena = Object.assign({
     player: { id: 'me', name: 'You', rating: 1500, rd: 350, vol: 0.06, wins: 0, losses: 0, draws: 0, streak: 0, best: 1500 },
     pool: [], placements: 0, placed: false,
@@ -133,6 +138,57 @@ function applySettings() {
   root.style.setProperty('--font-scale', S.settings.fontScale);
   document.body.classList.toggle('contrast', !!S.settings.contrast);
   document.body.classList.toggle('no-motion', !S.settings.motion);
+  fx.setMuted(!S.settings.sound);
+  fx.setReducedMotion(!S.settings.motion);
+}
+
+/* --------------------------------------------------------------- badges */
+
+function badgeContext(flags) {
+  const answers = Object.values(S.history).reduce((n, h) => n + h.correct + h.wrong, 0);
+  const correct = Object.values(S.history).reduce((n, h) => n + h.correct, 0);
+  return {
+    flags: flags || {},
+    lessonsDone: lessonList.filter((l) => lessonProgress(l.id).crowns > 0).length,
+    subjectsTouched: subjects.filter((s) => subjectDone(s) > 0).length,
+    labChallenges: labs.reduce((n, l) => n + labProgress(l.id).done.length, 0),
+    labsCleared: labsCleared(),
+    labsTotal: labs.length,
+    answers,
+    accuracy: answers ? Math.round((correct / answers) * 100) : 0,
+    tierRank: S.arena.placed && S.arena.lastTier ? tierRank(S.arena.lastTier) : 99
+  };
+}
+
+/** Called after anything that could unlock a badge. Awards, celebrates, saves. */
+async function checkBadges(flags) {
+  const fresh = evaluate(S, badgeContext(flags));
+  if (!fresh.length) return [];
+  S.badges = (S.badges || []).concat(fresh.map((b) => b.id));
+  S.gems += fresh.length * 20;
+  await save();
+  paintTopbar();
+  fresh.forEach((b, i) => setTimeout(() => {
+    fx.play('badge');
+    fx.confetti(50);
+    badgeToast(b);
+  }, i * 900));
+  return fresh;
+}
+
+function badgeToast(badge) {
+  const el = document.createElement('div');
+  el.className = 'badge-toast';
+  el.innerHTML = `
+    <div class="bt-icon">${esc(badge.icon)}</div>
+    <div>
+      <div class="bt-kicker">Badge unlocked &middot; +20 gems</div>
+      <div class="bt-name">${esc(badge.name)}</div>
+      <div class="bt-desc">${esc(badge.desc)}</div>
+    </div>`;
+  document.body.appendChild(el);
+  requestAnimationFrame(() => el.classList.add('in'));
+  setTimeout(() => { el.classList.remove('in'); setTimeout(() => el.remove(), 400); }, 3400);
 }
 
 function lessonProgress(id) {
@@ -262,6 +318,7 @@ function go(viewName, arg) {
   if (arenaUi) arenaUi.leave();
   route = { view: viewName, arg: arg || null };
   paintTopbar();
+  paintTitle();
   if (viewName === 'home') renderHome();
   else if (viewName === 'path') renderPath(arg);
   else if (viewName === 'labs') renderLabs();
@@ -312,18 +369,33 @@ function settingsModal() {
     <div class="setting"><span class="k">Lessons complete</span><span class="v">${done} / ${lessonList.length}</span></div>
     <div class="setting"><span class="k">Crowns earned</span><span class="v">${crowns} / ${lessonList.length * MAX_CROWNS}</span></div>
     <div class="setting"><span class="k">Labs cleared</span><span class="v">${labsCleared()} / ${labs.length}</span></div>
-    <div class="setting"><span class="k">Python interpreter</span><span class="v">${pythonOK ? 'found' : 'not found'}</span></div>
+    <div class="setting"><span class="k">Python interpreter</span><span class="v">${pythonOK ? esc(appInfo.python || 'found') : '<button class="mini-btn" data-act="python">not found — check again</button>'}</span></div>
+    <div class="setting"><span class="k">Version</span><span class="v">${esc(appInfo.version)}</span></div>
     <div class="setting"><span class="k">Daily goal</span><span class="v"><button class="mini-btn" data-act="goal">${S.dailyGoal} XP</button></span></div>
     <div class="setting"><span class="k">Text size</span><span class="v"><button class="mini-btn" data-act="font">${Math.round(S.settings.fontScale * 100)}%</button></span></div>
     <div class="setting"><span class="k">High contrast</span><span class="v"><button class="mini-btn" data-act="contrast">${S.settings.contrast ? 'on' : 'off'}</button></span></div>
     <div class="setting"><span class="k">Animations</span><span class="v"><button class="mini-btn" data-act="motion">${S.settings.motion ? 'on' : 'reduced'}</button></span></div>
+    <div class="setting"><span class="k">Sound effects</span><span class="v"><button class="mini-btn" data-act="sound">${S.settings.sound ? 'on' : 'off'}</button></span></div>
+    <div class="setting"><span class="k">Badges</span><span class="v">${(S.badges || []).length} / ${BADGES.length}</span></div>
     <div class="row">
       <button class="btn blue" data-act="export">Export report</button>
       <button class="btn red" data-act="reset">Reset</button>
     </div>
-    <div class="row"><button class="btn" data-close="1">Close</button></div>
+    <div class="row">
+      <button class="btn ghost" data-act="shortcuts">Shortcuts</button>
+      <button class="btn" data-close="1">Close</button>
+    </div>
   `, (box) => {
     const rerun = async () => { await save(); applySettings(); settingsModal(); };
+    box.querySelector('[data-act="shortcuts"]').onclick = shortcutsModal;
+    const pyBtn = box.querySelector('[data-act="python"]');
+    if (pyBtn) pyBtn.onclick = async () => {
+      pyBtn.textContent = 'checking…';
+      pythonOK = await api.recheckPython();
+      appInfo = await api.appInfo();
+      settingsModal();
+      toast(pythonOK ? 'Python found — code exercises are on' : 'Still no Python interpreter');
+    };
     box.querySelector('[data-act="goal"]').onclick = () => {
       const goals = [20, 50, 100, 200];
       S.dailyGoal = goals[(goals.indexOf(S.dailyGoal) + 1) % goals.length];
@@ -340,6 +412,12 @@ function settingsModal() {
     };
     box.querySelector('[data-act="motion"]').onclick = () => {
       S.settings.motion = !S.settings.motion;
+      rerun();
+    };
+    box.querySelector('[data-act="sound"]').onclick = () => {
+      S.settings.sound = !S.settings.sound;
+      fx.setMuted(!S.settings.sound);
+      if (S.settings.sound) fx.play('correct');
       rerun();
     };
     box.querySelector('[data-act="export"]').onclick = exportReport;
@@ -365,6 +443,24 @@ function settingsModal() {
 }
 
 document.getElementById('btn-settings').onclick = settingsModal;
+
+function shortcutsModal() {
+  const rows = [
+    ['1 – 9', 'Pick an option, a word chip or a code line'],
+    ['Enter', 'Check the answer, then continue'],
+    ['Esc', 'Leave the lesson, or close a dialog'],
+    ['Tab', 'Insert four spaces inside a code editor'],
+    ['Ctrl + Enter', 'Run the code you have written'],
+    ['Ctrl + +  /  Ctrl + -', 'Zoom the whole window in or out'],
+    ['F11', 'Full screen']
+  ];
+  openModal(`
+    <h2>Keyboard shortcuts</h2>
+    <p>Everything in Codingo can be driven from the keyboard.</p>
+    ${rows.map(([k, v]) => `<div class="setting"><span class="k"><kbd>${esc(k)}</kbd></span><span class="v shortcut-what">${esc(v)}</span></div>`).join('')}
+    <div class="row"><button class="btn" data-close="1">Close</button></div>
+  `);
+}
 
 async function exportReport() {
   const json = {
@@ -1215,15 +1311,28 @@ async function onPrimary() {
       session.bestCombo = Math.max(session.bestCombo, session.combo);
       const quick = seconds <= 8 && ex.type !== 'code';
       if (quick) session.quickAnswers++;
-      const gained = Math.round(2 * comboMultiplier(session.combo)) + (quick ? 1 : 0);
-      result.bonus = { mult: comboMultiplier(session.combo), quick, gained };
+      const mult = comboMultiplier(session.combo);
+      const gained = Math.round(2 * mult) + (quick ? 1 : 0);
+      result.bonus = { mult, quick, gained };
       session.xpEarned += gained;
       recordXp(session.lesson.subjectId, gained);
+      if (quick) S.counters.quick += 1;
+      S.counters.bestCombo = Math.max(S.counters.bestCombo, session.combo);
+
+      const anchor = view.querySelector('.option.right, .bug-line.right, .prompt');
+      fx.play(mult > 1 ? 'combo' : 'correct', session.combo);
+      fx.burstAt(anchor, { count: 14 + session.combo * 3, up: true, speed: 4 + mult });
+      fx.floatText('+' + gained + ' XP', anchor, 'xp');
+      if (mult >= 2) { fx.confetti(40); fx.slam('x2 COMBO', '#ffc800'); }
     } else {
       session.mistakes++;
       session.combo = 0;
       S.hearts = Math.max(0, S.hearts - 1);
       bumpStat('stat-hearts');
+      fx.play('wrong');
+      fx.shake('soft');
+      fx.flash('rgba(255,75,75,.22)');
+      fx.play('heart');
       session.queue.push(ex);           // a missed exercise returns at the end
       session.total = session.queue.length;
     }
@@ -1233,6 +1342,7 @@ async function onPrimary() {
     paintTopbar();
     paintLiveChips();
     showFeedback(result, ex);
+    checkBadges({ comboX2: session.combo >= 8 });
     return;
   }
 
@@ -1339,6 +1449,10 @@ async function finishLesson() {
   await save();
   paintTopbar();
 
+  fx.play('complete');
+  fx.confetti(perfect ? 160 : 80);
+  if (perfect) setTimeout(() => fx.slam('FLAWLESS', '#58cc02'), 250);
+
   const minutes = Math.max(1, Math.round((Date.now() - session.startedAt) / 60000));
   const nextId = firstOpenLesson(subject.id);
   const weak = weakestTopics(1)[0];
@@ -1382,6 +1496,7 @@ async function finishLesson() {
   if (practice) practice.onclick = () => startLesson(practice.dataset.practice);
   const golab = view.querySelector('[data-golab]');
   if (golab) golab.onclick = () => { session = null; go('lab', golab.dataset.golab); };
+  checkBadges({ flawless: perfect, comboX2: session.bestCombo >= 8 });
   session = null;
 }
 
@@ -1518,7 +1633,10 @@ function renderLab(labId) {
     await save();
     paintTopbar();
     bumpStat('stat-xp');
+    fx.play('complete');
+    fx.confetti(60);
     toast('Challenge cleared  +' + gained + ' XP');
+    checkBadges();
     return true;
   };
 
@@ -1652,8 +1770,12 @@ function renderCodeLab(lab) {
       h.labs += 1;
       S.history[today()] = h;
       touchStreak();
+      fx.play('complete');
+      fx.confetti(60);
       toast('Challenge cleared  +' + gained + ' XP');
+      checkBadges();
     } else {
+      fx.play('wrong');
       toast('No challenge matches that output yet');
     }
     await save();
@@ -1795,6 +1917,20 @@ function renderProgress() {
         ${labRows}
       </div>
 
+      <div class="panel">
+        <div class="panel-title">Badges &mdash; ${(S.badges || []).length} of ${BADGES.length}</div>
+        <div class="badge-grid">
+          ${BADGES.map((b) => {
+            const owned = (S.badges || []).includes(b.id);
+            return `<div class="badge ${owned ? 'owned' : 'locked'}" title="${esc(b.desc)}">
+              <div class="badge-icon">${owned ? esc(b.icon) : '?'}</div>
+              <div class="badge-name">${esc(b.name)}</div>
+              <div class="badge-desc">${esc(b.desc)}</div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+
       <div class="row-actions">
         <button class="btn blue" id="btn-export">Export report</button>
         <button class="btn ghost" id="btn-goto-labs">Open labs</button>
@@ -1871,14 +2007,15 @@ function renderSdg() {
 /* ================================================================ arena */
 
 const arenaUi = createArena({
-  esc, hl, view, api, toast, shuffle, today, lessonList,
+  esc, hl, view, api, toast, shuffle, today, lessonList, fx,
   state: () => S,
   save: () => save(),
   paintTopbar,
   recordXp,
   touchStreak,
   openModal,
-  closeModal
+  closeModal,
+  checkBadges
 });
 
 /* =========================================================== keyboard */
@@ -1912,11 +2049,37 @@ document.addEventListener('keydown', (e) => {
 
 /* ================================================================ boot */
 
+/* ================================================= app-level plumbing */
+
+const VIEW_TITLES = {
+  home: 'Learn', path: 'Learn', lesson: 'Lesson', labs: 'Virtual Labs', lab: 'Virtual Labs',
+  arena: 'Arena', ladder: 'Leaderboard', progress: 'Progress', sdg: 'Impact'
+};
+
+function paintTitle() {
+  document.title = 'Codingo — ' + (VIEW_TITLES[route.view] || 'Learn');
+}
+
+// A crash in one screen should not leave the learner staring at a blank window.
+window.addEventListener('error', (e) => {
+  console.error('renderer error', e.error || e.message);
+  toast('Something went wrong on that screen');
+});
+window.addEventListener('unhandledrejection', (e) => {
+  console.error('unhandled rejection', e.reason);
+});
+
 (async function boot() {
   pythonOK = await api.pythonAvailable();
+  appInfo = await api.appInfo();
   await initState();
   paintTopbar();
   go('home');
+
+  api.onMenu((channel) => {
+    if (channel === 'menu:export') exportReport();
+    else if (channel === 'menu:shortcuts') shortcutsModal();
+  });
 
   if (!S.seenIntro) {
     S.seenIntro = true;

@@ -155,8 +155,8 @@ export default {
         {
           type: 'match',
           q: 'Match each expression to its value.',
-          pairs: [['bool([])', 'False'], ['bool([0])', 'True'], ['None == False', 'False'], ['not not 5', 'True']],
-          explain: 'An empty list is falsy, but a list holding a falsy value is still non-empty.'
+          pairs: [['bool([])', 'False'], ['bool([0])', 'True'], ['"" or "hi"', 'hi'], ['5 and 0', '0']],
+          explain: 'An empty list is falsy, but a list holding a falsy value is still non-empty. and / or return one of their operands rather than a bool.'
         }
       ]
     },

@@ -1,20 +1,94 @@
 {
   "name": "codingo",
+  "productName": "Codingo",
   "version": "1.0.0",
-  "description": "Codingo - learn Python the addictive way",
+  "description": "Gamified e-learning for STEM and coding: lessons, virtual labs and ranked duels, fully offline.",
   "main": "main.js",
+  "type": "commonjs",
+  "homepage": "https://github.com/SecretOfficer/Codingo",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SecretOfficer/Codingo.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SecretOfficer/Codingo/issues"
+  },
+  "author": {
+    "name": "Cockroach Tech Team"
+  },
+  "license": "MIT",
   "scripts": {
     "start": "electron .",
-    "dev": "electron . --dev"
+    "dev": "electron . --dev",
+    "icon": "node scripts/make-icon.js",
+    "verify": "node scripts/verify.js",
+    "pack": "electron-builder --dir",
+    "dist": "electron-builder",
+    "dist:win": "electron-builder --win",
+    "dist:portable": "electron-builder --win portable",
+    "dist:zip": "electron-builder --win zip -c.win.signAndEditExecutable=false"
   },
   "keywords": [
+    "education",
+    "stem",
     "python",
-    "learning",
+    "gamification",
+    "virtual-labs",
     "electron"
   ],
-  "author": "",
-  "license": "MIT",
   "devDependencies": {
-    "electron": "^43.4.1"
+    "electron": "^43.4.1",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "com.cockroachtech.codingo",
+    "productName": "Codingo",
+    "copyright": "Copyright (c) 2026 Cockroach Tech Team",
+    "directories": {
+      "output": "release",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "arena-engine.js",
+      "arena-problems.js",
+      "src/**/*",
+      "build/icon.png",
+      "!**/*.map"
+    ],
+    "extraMetadata": {
+      "main": "main.js"
+    },
+    "win": {
+      "target": [
+        { "target": "nsis", "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] }
+      ],
+      "icon": "build/icon.png",
+      "artifactName": "${productName}-${version}-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Codingo",
+      "uninstallDisplayName": "Codingo"
+    },
+    "portable": {
+      "artifactName": "${productName}-${version}-portable.${ext}"
+    },
+    "linux": {
+      "target": ["AppImage"],
+      "category": "Education",
+      "icon": "build/icon.png"
+    },
+    "mac": {
+      "target": ["dmg"],
+      "category": "public.app-category.education",
+      "icon": "build/icon.png"
+    }
   }
 }
