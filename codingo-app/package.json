@@ -1,0 +1,32 @@
+{
+  "name": "codingo-learning",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./out/main/index.js",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "tsc -b && electron-vite build",
+    "preview": "electron-vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.112.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "electron-vite": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "vite": "^7.3.6"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "latest",
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "electron": "^43.4.1",
+    "tailwindcss": "latest",
+    "typescript": "latest",
+    "vitest": "latest"
+  }
+}
