@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;">
+  <title>Codingo</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header id="topbar">
+    <div class="brand">
+      <span class="brand-mark">&lt;/&gt;</span>
+      <span class="brand-name">Codingo</span>
+    </div>
+
+    <nav id="nav">
+      <button class="nav-btn" data-view="home">Learn</button>
+      <button class="nav-btn" data-view="labs">Virtual Labs</button>
+      <button class="nav-btn" data-view="arena">Arena</button>
+      <button class="nav-btn" data-view="progress">Progress</button>
+      <button class="nav-btn" data-view="sdg">Impact</button>
+    </nav>
+
+    <div class="stats">
+      <div class="stat" id="stat-streak" title="Day streak"><span class="stat-icon streak">&#9650;</span><span class="stat-value" id="v-streak">0</span></div>
+      <div class="stat" id="stat-gems" title="Gems"><span class="stat-icon gems">&#9670;</span><span class="stat-value" id="v-gems">0</span></div>
+      <div class="stat" id="stat-hearts" title="Hearts"><span class="stat-icon hearts">&#9829;</span><span class="stat-value" id="v-hearts">5</span></div>
+      <div class="stat" id="stat-xp" title="Total XP"><span class="stat-icon xp">&#9733;</span><span class="stat-value" id="v-xp">0</span></div>
+      <button class="icon-btn" id="btn-settings" title="Settings">&#9881;</button>
+    </div>
+  </header>
+
+  <main id="view"></main>
+
+  <div id="modal-root" class="modal-root hidden">
+    <div class="modal-backdrop" data-close="1"></div>
+    <div class="modal" id="modal-box"></div>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
