@@ -546,7 +546,7 @@ export function createCodex(ctx) {
       }
       fx.play('victory');
       fx.confetti(140);
-      fx.slam('VICTORY', '#58cc02');
+      fx.slam('VICTORY', '#7fa650');
     } else {
       g.battles.losses += 1;
       gems = 8;

@@ -1,4 +1,4 @@
-import {
+﻿import {
   subjects, lessonList, getLesson, getUnitOf, getSubjectOf, getSubject, unitPool, totalExercises, worldOfUnit
 } from './course/index.js';
 import { labs, getLab, labState } from './labs.js';
@@ -191,9 +191,20 @@ function badgeToast(badge) {
       <div class="bt-name">${esc(badge.name)}</div>
       <div class="bt-desc">${esc(badge.desc)}</div>
     </div>`;
-  document.body.appendChild(el);
+  badgeStack().appendChild(el);
   requestAnimationFrame(() => el.classList.add('in'));
   setTimeout(() => { el.classList.remove('in'); setTimeout(() => el.remove(), 400); }, 3400);
+}
+
+/** One shared column, so two unlocks in the same second stack instead of overlapping. */
+function badgeStack() {
+  let stack = document.getElementById('badge-stack');
+  if (!stack) {
+    stack = document.createElement('div');
+    stack.id = 'badge-stack';
+    document.body.appendChild(stack);
+  }
+  return stack;
 }
 
 function lessonProgress(id) {
@@ -376,7 +387,7 @@ function settingsModal() {
     <div class="setting"><span class="k">Lessons complete</span><span class="v">${done} / ${lessonList.length}</span></div>
     <div class="setting"><span class="k">Crowns earned</span><span class="v">${crowns} / ${lessonList.length * MAX_CROWNS}</span></div>
     <div class="setting"><span class="k">Labs cleared</span><span class="v">${labsCleared()} / ${labs.length}</span></div>
-    <div class="setting"><span class="k">Python interpreter</span><span class="v">${pythonOK ? esc(appInfo.python || 'found') : '<button class="mini-btn" data-act="python">not found — check again</button>'}</span></div>
+    <div class="setting"><span class="k">Python interpreter</span><span class="v">${pythonOK ? esc(appInfo.python || 'found') : '<button class="mini-btn" data-act="python">not found â€” check again</button>'}</span></div>
     <div class="setting"><span class="k">Version</span><span class="v">${esc(appInfo.version)}</span></div>
     <div class="setting"><span class="k">Daily goal</span><span class="v"><button class="mini-btn" data-act="goal">${S.dailyGoal} XP</button></span></div>
     <div class="setting"><span class="k">Text size</span><span class="v"><button class="mini-btn" data-act="font">${Math.round(S.settings.fontScale * 100)}%</button></span></div>
@@ -397,11 +408,11 @@ function settingsModal() {
     box.querySelector('[data-act="shortcuts"]').onclick = shortcutsModal;
     const pyBtn = box.querySelector('[data-act="python"]');
     if (pyBtn) pyBtn.onclick = async () => {
-      pyBtn.textContent = 'checking…';
+      pyBtn.textContent = 'checkingâ€¦';
       pythonOK = await api.recheckPython();
       appInfo = await api.appInfo();
       settingsModal();
-      toast(pythonOK ? 'Python found — code exercises are on' : 'Still no Python interpreter');
+      toast(pythonOK ? 'Python found â€” code exercises are on' : 'Still no Python interpreter');
     };
     box.querySelector('[data-act="goal"]').onclick = () => {
       const goals = [20, 50, 100, 200];
@@ -453,7 +464,7 @@ document.getElementById('btn-settings').onclick = settingsModal;
 
 function shortcutsModal() {
   const rows = [
-    ['1 – 9', 'Pick an option, a word chip or a code line'],
+    ['1 â€“ 9', 'Pick an option, a word chip or a code line'],
     ['Enter', 'Check the answer, then continue'],
     ['Esc', 'Leave the lesson, or close a dialog'],
     ['Tab', 'Insert four spaces inside a code editor'],
@@ -651,8 +662,8 @@ function renderPath(subjectId) {
       const isCurrent = unlocked && p.crowns === 0;
       const offsets = [0, 62, 88, 62, 0, -62, -88, -62];
       const dx = offsets[lesson.orderInSubject % offsets.length];
-      const color = p.crowns > 0 ? unit.color : (unlocked ? '#dbe4f5' : '');
-      const shadow = p.crowns > 0 ? 'inset 0 -6px 0 rgba(0,0,0,.22), 0 6px 0 rgba(0,0,0,.35)' : '0 6px 0 #9aa7bf';
+      const color = p.crowns > 0 ? unit.color : (unlocked ? '#d9cec0' : '');
+      const shadow = p.crowns > 0 ? 'inset 0 -3px 0 rgba(0,0,0,.18), 0 3px 0 rgba(0,0,0,.3)' : '0 3px 0 #6e6156';
       const cls = ['node'];
       if (!unlocked) cls.push('locked');
       if (p.crowns > 0) cls.push('done');
@@ -1330,7 +1341,7 @@ async function onPrimary() {
       fx.play(mult > 1 ? 'combo' : 'correct', session.combo);
       fx.burstAt(anchor, { count: 14 + session.combo * 3, up: true, speed: 4 + mult });
       fx.floatText('+' + gained + ' XP', anchor, 'xp');
-      if (mult >= 2) { fx.confetti(40); fx.slam('x2 COMBO', '#ffc800'); }
+      if (mult >= 2) { fx.confetti(40); fx.slam('x2 COMBO', '#e0a83c'); }
     } else {
       session.mistakes++;
       session.combo = 0;
@@ -1338,7 +1349,7 @@ async function onPrimary() {
       bumpStat('stat-hearts');
       fx.play('wrong');
       fx.shake('soft');
-      fx.flash('rgba(255,75,75,.22)');
+      fx.flash('rgba(196,85,61,.22)');
       fx.play('heart');
       session.queue.push(ex);           // a missed exercise returns at the end
       session.total = session.queue.length;
@@ -1461,7 +1472,7 @@ async function finishLesson() {
 
   fx.play('complete');
   fx.confetti(perfect ? 160 : 80);
-  if (perfect) setTimeout(() => fx.slam('FLAWLESS', '#58cc02'), 250);
+  if (perfect) setTimeout(() => fx.slam('FLAWLESS', '#7fa650'), 250);
 
   const minutes = Math.max(1, Math.round((Date.now() - session.startedAt) / 60000));
   const nextId = firstOpenLesson(subject.id);
@@ -1818,7 +1829,7 @@ function barChart(rows, colour) {
     const bh = (r.value / max) * (h - 46);
     const x = pad + i * bw;
     const y = h - 26 - bh;
-    return `<rect x="${x + 2}" y="${y}" width="${bw - 6}" height="${Math.max(1, bh)}" rx="3" fill="${r.value ? colour : '#232c40'}"></rect>
+    return `<rect x="${x + 2}" y="${y}" width="${bw - 6}" height="${Math.max(1, bh)}" rx="3" fill="${r.value ? colour : '#2a241d'}"></rect>
       <text x="${x + bw / 2}" y="${h - 10}" text-anchor="middle" class="ch-label">${esc(r.label)}</text>
       ${r.value ? `<text x="${x + bw / 2}" y="${y - 5}" text-anchor="middle" class="ch-value">${r.value}</text>` : ''}`;
   }).join('');
@@ -1829,7 +1840,7 @@ function donut(pct, colour, caption) {
   const r = 52, c = 2 * Math.PI * r;
   const off = c * (1 - pct / 100);
   return `<svg viewBox="0 0 140 140" class="donut">
-    <circle cx="70" cy="70" r="${r}" fill="none" stroke="#232c40" stroke-width="16"></circle>
+    <circle cx="70" cy="70" r="${r}" fill="none" stroke="#2a241d" stroke-width="16"></circle>
     <circle cx="70" cy="70" r="${r}" fill="none" stroke="${colour}" stroke-width="16" stroke-linecap="round"
       stroke-dasharray="${c}" stroke-dashoffset="${off}" transform="rotate(-90 70 70)"></circle>
     <text x="70" y="66" text-anchor="middle" class="donut-v">${pct}%</text>
@@ -1903,11 +1914,11 @@ function renderProgress() {
       <div class="panel-grid">
         <div class="panel">
           <div class="panel-title">XP over the last 14 days</div>
-          ${barChart(days, '#58cc02')}
+          ${barChart(days, '#7fa650')}
         </div>
         <div class="panel center">
           <div class="panel-title">Overall accuracy</div>
-          ${donut(accuracy, accuracy >= 80 ? '#58cc02' : (accuracy >= 60 ? '#ffc800' : '#ff4b4b'), 'correct')}
+          ${donut(accuracy, accuracy >= 80 ? '#7fa650' : (accuracy >= 60 ? '#e0a83c' : '#c4553d'), 'correct')}
           <div class="panel-note">${totalCorrect} right, ${totalWrong} wrong, out of ${totalExercises} authored exercises.</div>
         </div>
       </div>
@@ -2087,7 +2098,7 @@ const VIEW_TITLES = {
 };
 
 function paintTitle() {
-  document.title = 'Codingo — ' + (VIEW_TITLES[route.view] || 'Learn');
+  document.title = 'Codingo â€” ' + (VIEW_TITLES[route.view] || 'Learn');
 }
 
 // A crash in one screen should not leave the learner staring at a blank window.

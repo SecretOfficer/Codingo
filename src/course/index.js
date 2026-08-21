@@ -16,7 +16,7 @@ const rawSubjects = [
     id: 'code',
     name: 'Coding',
     tagline: 'Python from print() to classes',
-    color: '#58cc02',
+    color: '#7fa650',
     icon: '</>',
     units: [u1, u2, u3, u4, u5, u6, u7, u8]
   },
@@ -24,7 +24,7 @@ const rawSubjects = [
     id: 'math',
     name: 'Mathematics',
     tagline: 'Number, algebra, geometry, data',
-    color: '#1cb0f6',
+    color: '#6a9cb0',
     icon: 'x+y',
     units: mathUnits
   },
@@ -32,7 +32,7 @@ const rawSubjects = [
     id: 'physics',
     name: 'Physics',
     tagline: 'Motion, forces, energy, circuits',
-    color: '#ff9600',
+    color: '#d07e3a',
     icon: 'F=ma',
     units: physicsUnits
   },
@@ -40,7 +40,7 @@ const rawSubjects = [
     id: 'chem',
     name: 'Chemistry',
     tagline: 'Atoms, bonding, reactions, pH',
-    color: '#ce82ff',
+    color: '#b07cc6',
     icon: 'H2O',
     units: chemistryUnits
   },
@@ -48,7 +48,7 @@ const rawSubjects = [
     id: 'bio',
     name: 'Biology',
     tagline: 'Cells, bodies, genes, ecosystems',
-    color: '#2ec4b6',
+    color: '#59a392',
     icon: 'DNA',
     units: biologyUnits
   }
@@ -72,11 +72,11 @@ export const subjects = rawSubjects.map((subject) => ({
 
 // Themed worlds for the coding track, the map the learner walks through.
 export const worlds = [
-  { id: 'sands', name: 'Syntax Sands', tagline: 'Where every program starts', units: ['u1', 'u2'], color: '#ffc800' },
-  { id: 'lagoon', name: 'Logic Lagoon', tagline: 'Text, truth and branching', units: ['u3', 'u4'], color: '#1cb0f6' },
-  { id: 'steppes', name: 'Structure Steppes', tagline: 'Collections and repetition', units: ['u5'], color: '#58cc02' },
-  { id: 'ascent', name: 'Algorithm Ascent', tagline: 'Functions and data shapes', units: ['u6', 'u7'], color: '#ff9600' },
-  { id: 'apex', name: "Architect's Apex", tagline: 'Objects, failure and files', units: ['u8'], color: '#a560ff' }
+  { id: 'sands', name: 'Syntax Sands', tagline: 'Where every program starts', units: ['u1', 'u2'], color: '#e0a83c' },
+  { id: 'lagoon', name: 'Logic Lagoon', tagline: 'Text, truth and branching', units: ['u3', 'u4'], color: '#6a9cb0' },
+  { id: 'steppes', name: 'Structure Steppes', tagline: 'Collections and repetition', units: ['u5'], color: '#7fa650' },
+  { id: 'ascent', name: 'Algorithm Ascent', tagline: 'Functions and data shapes', units: ['u6', 'u7'], color: '#d07e3a' },
+  { id: 'apex', name: "Architect's Apex", tagline: 'Objects, failure and files', units: ['u8'], color: '#9b6bc0' }
 ];
 
 export function worldOfUnit(unitId) {

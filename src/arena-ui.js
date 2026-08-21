@@ -9,21 +9,21 @@ const MODES = [
     id: 'debug',
     name: 'Debug Duel',
     icon: 'BUG',
-    color: '#ff4b4b',
+    color: '#c4553d',
     blurb: 'A working function has been broken. Find the fault and fix it before your opponent does. Run the tests as often as you like.'
   },
   {
     id: 'vibecode',
     name: '1-Shot Vibecode Duel',
     icon: '1ST',
-    color: '#a560ff',
+    color: '#9b6bc0',
     blurb: 'Read the spec, write the function, submit once. No test runs, no second attempt. Planning beats guessing.'
   },
   {
     id: 'rapid',
     name: 'Rapid STEM Duel',
     icon: 'x6',
-    color: '#1cb0f6',
+    color: '#6a9cb0',
     blurb: 'Six questions pulled from every subject you have unlocked. Answer faster and more accurately than the opponent.'
   }
 ];
@@ -35,8 +35,8 @@ export function createArena(ctx) {
   function countdown() {
     return new Promise((resolve) => {
       const beats = ['3', '2', '1'];
-      beats.forEach((b, i) => setTimeout(() => { fx.slam(b, '#eaf0fb'); fx.play('countdown'); }, i * 600));
-      setTimeout(() => { fx.slam('FIGHT', '#ff4b4b'); fx.play('go'); }, beats.length * 600);
+      beats.forEach((b, i) => setTimeout(() => { fx.slam(b, '#f4efe7'); fx.play('countdown'); }, i * 600));
+      setTimeout(() => { fx.slam('FIGHT', '#c4553d'); fx.play('go'); }, beats.length * 600);
       setTimeout(resolve, beats.length * 600 + 500);
     });
   }
@@ -507,7 +507,7 @@ export function createArena(ctx) {
           <div class="duel-side me"><div class="ds-name">You</div><div class="ds-score">${live.myScore}</div></div>
           <div class="duel-center">
             <div class="duel-clock" id="duel-clock">20s</div>
-            <div class="duel-mode" style="color:#1cb0f6">Question ${index + 1} of ${questions.length}</div>
+            <div class="duel-mode" style="color:#6a9cb0">Question ${index + 1} of ${questions.length}</div>
             <div class="opp-progress"><div class="opp-fill" id="opp-fill"></div></div>
           </div>
           <div class="duel-side opp"><div class="ds-name">${esc(opponent.name)}</div><div class="ds-score">${live.oppScore}</div></div>
@@ -674,11 +674,11 @@ export function createArena(ctx) {
     if (result === 'win') {
       fx.play('victory');
       fx.confetti(150);
-      fx.slam('VICTORY', '#58cc02');
+      fx.slam('VICTORY', '#7fa650');
     } else if (result === 'loss') {
       fx.play('defeat');
       fx.shake('hard');
-      fx.flash('rgba(255,75,75,.25)');
+      fx.flash('rgba(196,85,61,.25)');
     } else {
       fx.play('complete');
     }

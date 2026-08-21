@@ -3,7 +3,7 @@ export const chemistryUnits = [
     id: 'c1',
     title: 'Atoms & Elements',
     subtitle: 'What everything is made of',
-    color: '#ce82ff',
+    color: '#b07cc6',
     icon: 'ATM',
     lessons: [
       {
@@ -154,7 +154,7 @@ export const chemistryUnits = [
     id: 'c2',
     title: 'Reactions & Solutions',
     subtitle: 'Change, acids, rates',
-    color: '#2ec4b6',
+    color: '#59a392',
     icon: 'RXN',
     lessons: [
       {

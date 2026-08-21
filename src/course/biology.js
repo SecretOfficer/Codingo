@@ -3,7 +3,7 @@ export const biologyUnits = [
     id: 'b1',
     title: 'Cells & the Body',
     subtitle: 'How living things work',
-    color: '#58cc02',
+    color: '#7fa650',
     icon: 'BIO',
     lessons: [
       {
@@ -154,7 +154,7 @@ export const biologyUnits = [
     id: 'b2',
     title: 'Genetics & Ecology',
     subtitle: 'Inheritance and the environment',
-    color: '#ff4b4b',
+    color: '#c4553d',
     icon: 'DNA',
     lessons: [
       {

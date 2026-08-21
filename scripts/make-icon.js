@@ -1,4 +1,4 @@
-/* Generates build/icon.png (512x512) with no image libraries: the artwork is drawn
+﻿/* Generates build/icon.png (512x512) with no image libraries: the artwork is drawn
    with signed-distance maths into an RGBA buffer, then encoded as a PNG by hand.
    Run with `npm run icon` after changing anything here. */
 
@@ -7,10 +7,10 @@ const path = require('path');
 const zlib = require('zlib');
 
 const SIZE = 512;
-const BG = [15, 20, 32];        // app background navy
-const PLATE = [22, 29, 45];
-const GREEN = [88, 204, 2];
-const BLUE = [28, 176, 246];
+const BG = [20, 17, 15];        // warm ink, matching --bg
+const PLATE = [28, 24, 21];     // --bg-2
+const GREEN = [127, 166, 80];   // moss, --green
+const BLUE = [106, 156, 176];   // slate, --blue
 
 /* ------------------------------------------------------------ geometry */
 
@@ -86,7 +86,7 @@ function render() {
 
       // inner ring hint
       const ring = Math.abs(roundRectDist(sx, sy, c, c, plateHalf - SIZE * 0.035, plateHalf - SIZE * 0.035, plateR * 0.8)) - 1.5;
-      mix(p, [42, 52, 72], cover(ring) * 0.9);
+      mix(p, [58, 50, 42], cover(ring) * 0.9);
 
       // chevrons in green, slash in blue
       let dMark = Infinity;

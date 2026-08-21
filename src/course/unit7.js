@@ -2,7 +2,7 @@ export default {
   id: 'u7',
   title: 'Dicts, Sets & Tuples',
   subtitle: 'Choosing the right container',
-  color: '#ffc800',
+  color: '#e0a83c',
   icon: 'MAP',
   lessons: [
     {

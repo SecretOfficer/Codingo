@@ -341,7 +341,7 @@ function createWindow() {
     height: 820,
     minWidth: 900,
     minHeight: 640,
-    backgroundColor: '#0f1420',
+    backgroundColor: '#14110f',
     title: 'Codingo',
     icon: path.join(__dirname, 'build', 'icon.png'),
     show: false,

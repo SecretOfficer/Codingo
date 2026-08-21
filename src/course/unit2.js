@@ -2,7 +2,7 @@ export default {
   id: 'u2',
   title: 'Variables & Types',
   subtitle: 'Boxes that hold values',
-  color: '#1cb0f6',
+  color: '#6a9cb0',
   icon: 'VAR',
   lessons: [
     {

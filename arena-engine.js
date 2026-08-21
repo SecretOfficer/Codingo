@@ -102,13 +102,13 @@ function winChance(a, b) {
 /* ------------------------------------------------------------------ tiers */
 
 const TIERS = [
-  { id: 'grandmaster', name: 'Grandmaster', cut: 0.005, color: '#ff4b4b' },
-  { id: 'master', name: 'Master', cut: 0.02, color: '#a560ff' },
-  { id: 'diamond', name: 'Diamond', cut: 0.06, color: '#1cb0f6' },
-  { id: 'platinum', name: 'Platinum', cut: 0.15, color: '#2ec4b6' },
-  { id: 'gold', name: 'Gold', cut: 0.30, color: '#ffc800' },
-  { id: 'silver', name: 'Silver', cut: 0.55, color: '#c3ccdb' },
-  { id: 'bronze', name: 'Bronze', cut: 1.0, color: '#cd7f32' }
+  { id: 'grandmaster', name: 'Grandmaster', cut: 0.005, color: '#c4553d' },
+  { id: 'master', name: 'Master', cut: 0.02, color: '#9b6bc0' },
+  { id: 'diamond', name: 'Diamond', cut: 0.06, color: '#6a9cb0' },
+  { id: 'platinum', name: 'Platinum', cut: 0.15, color: '#59a392' },
+  { id: 'gold', name: 'Gold', cut: 0.30, color: '#e0a83c' },
+  { id: 'silver', name: 'Silver', cut: 0.55, color: '#bbafa0' },
+  { id: 'bronze', name: 'Bronze', cut: 1.0, color: '#b0703c' }
 ];
 
 /** Percentile-based tiers recompute against the live population, so they cannot inflate. */

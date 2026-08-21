@@ -141,7 +141,7 @@ function loop() {
   raf = requestAnimationFrame(loop);
 }
 
-const PALETTE = ['#58cc02', '#1cb0f6', '#ffc800', '#ce82ff', '#ff4b4b', '#2ec4b6'];
+const PALETTE = ['#7fa650', '#6a9cb0', '#e0a83c', '#b07cc6', '#c4553d', '#59a392'];
 
 /**
  * @param {number} x screen x

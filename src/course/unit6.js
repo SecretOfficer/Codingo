@@ -2,7 +2,7 @@ export default {
   id: 'u6',
   title: 'Functions',
   subtitle: 'Package your logic',
-  color: '#2ec4b6',
+  color: '#59a392',
   icon: 'DEF',
   lessons: [
     {

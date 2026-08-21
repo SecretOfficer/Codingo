@@ -17,7 +17,7 @@ const ROSTER = [
     id: 'nullwyrm', name: 'Nullwyrm', title: 'The Undefined',
     subject: 'code', klass: 'tech', rarity: 5, power: 210,
     form: 'dragon', features: ['horns', 'wings', 'tail'],
-    palette: ['#a560ff', '#2b1a4a', '#ffc800'],
+    palette: ['#9b6bc0', '#2a2033', '#e0a83c'],
     lore: 'Every variable it touches becomes None. Ask it a question and it returns nothing, politely.',
     skill: 'Void Return — wins a lane outright if its power is within 10% of the defender.'
   },
@@ -25,7 +25,7 @@ const ROSTER = [
     id: 'recursa', name: 'Recursa', title: 'She Who Calls Herself',
     subject: 'code', klass: 'attack', rarity: 5, power: 198,
     form: 'elemental', features: ['halo', 'orbits'],
-    palette: ['#58cc02', '#0f2a10', '#eaf0fb'],
+    palette: ['#7fa650', '#1e2416', '#f4efe7'],
     lore: 'To understand Recursa you must first understand Recursa. Her base case is a well kept secret.',
     skill: 'Stack Frame — gains 6% power for each other Coding character on the team.'
   },
@@ -33,7 +33,7 @@ const ROSTER = [
     id: 'quanta', name: 'Quanta', title: 'Both Places at Once',
     subject: 'physics', klass: 'tech', rarity: 5, power: 205,
     form: 'elemental', features: ['orbits', 'visor'],
-    palette: ['#1cb0f6', '#04243a', '#ffffff'],
+    palette: ['#6a9cb0', '#152029', '#ffffff'],
     lore: 'Measured in one lane, found in another. Her position is a probability and her damage is not.',
     skill: 'Superposition — swaps to the weakest enemy lane before the first clash.'
   },
@@ -41,7 +41,7 @@ const ROSTER = [
     id: 'primearch', name: 'Primearch', title: 'Indivisible',
     subject: 'math', klass: 'guard', rarity: 5, power: 202,
     form: 'construct', features: ['crown', 'shield'],
-    palette: ['#ffc800', '#3a2a02', '#0f1420'],
+    palette: ['#e0a83c', '#2b2413', '#14110f'],
     lore: 'Divisible by one and by itself. Every attempt to factor it has ended in a long, quiet proof.',
     skill: 'Fundamental — cannot lose a lane by less than 5% power.'
   },
@@ -49,7 +49,7 @@ const ROSTER = [
     id: 'helixia', name: 'Helixia', title: 'Twice Written',
     subject: 'bio', klass: 'attack', rarity: 5, power: 196,
     form: 'beast', features: ['tail', 'crown'],
-    palette: ['#2ec4b6', '#052e2a', '#ff4b4b'],
+    palette: ['#59a392', '#16261f', '#c4553d'],
     lore: 'Carries a copy of every ally she has ever fought beside, coiled in four letters.',
     skill: 'Transcription — copies 15% of the strongest ally power.'
   },
@@ -57,7 +57,7 @@ const ROSTER = [
     id: 'catalys', name: 'Catalys', title: 'Unconsumed',
     subject: 'chem', klass: 'tech', rarity: 5, power: 200,
     form: 'elemental', features: ['orbits', 'halo'],
-    palette: ['#ce82ff', '#2a0f3a', '#58cc02'],
+    palette: ['#b07cc6', '#261a2c', '#7fa650'],
     lore: 'Lowers the energy every fight needs and walks away from all of them unchanged.',
     skill: 'Activation — the whole team clashes 10% harder on the first lane.'
   },
@@ -67,7 +67,7 @@ const ROSTER = [
     id: 'segfaultling', name: 'Segfaultling', title: 'Out of Bounds',
     subject: 'code', klass: 'attack', rarity: 4, power: 128,
     form: 'sprite', features: ['horns'],
-    palette: ['#ff4b4b', '#3a0d0d', '#ffc800'],
+    palette: ['#c4553d', '#2b1713', '#e0a83c'],
     lore: 'Reads one index past the end of things. Sometimes finds treasure, usually finds a crash.',
     skill: 'Overflow — 20% power against Guard class.'
   },
@@ -75,7 +75,7 @@ const ROSTER = [
     id: 'lambdroid', name: 'Lambdroid', title: 'Anonymous',
     subject: 'code', klass: 'tech', rarity: 4, power: 122,
     form: 'construct', features: ['visor'],
-    palette: ['#58cc02', '#12240a', '#1cb0f6'],
+    palette: ['#7fa650', '#1f2416', '#6a9cb0'],
     lore: 'Has no name of its own, only one expression, and it returns it immediately.',
     skill: 'One Liner — never varies; its lane roll has no randomness.'
   },
@@ -83,7 +83,7 @@ const ROSTER = [
     id: 'loopwarden', name: 'Loopwarden', title: 'Until False',
     subject: 'code', klass: 'guard', rarity: 4, power: 126,
     form: 'construct', features: ['shield', 'crown'],
-    palette: ['#1cb0f6', '#062435', '#eaf0fb'],
+    palette: ['#6a9cb0', '#152028', '#f4efe7'],
     lore: 'Stands its ground while the condition holds. Nobody has told it the condition changed.',
     skill: 'Sentinel — takes 15% less in the first lane.'
   },
@@ -91,7 +91,7 @@ const ROSTER = [
     id: 'fractala', name: 'Fractala', title: 'Self Similar',
     subject: 'math', klass: 'tech', rarity: 4, power: 124,
     form: 'elemental', features: ['orbits'],
-    palette: ['#1cb0f6', '#08243a', '#ce82ff'],
+    palette: ['#6a9cb0', '#152029', '#b07cc6'],
     lore: 'Zoom in on any part of her and you will find the whole of her, smaller and just as sharp.',
     skill: 'Iteration — 8% power for each lane already won.'
   },
@@ -99,7 +99,7 @@ const ROSTER = [
     id: 'vectra', name: 'Vectra', title: 'Magnitude and Direction',
     subject: 'math', klass: 'attack', rarity: 4, power: 130,
     form: 'sprite', features: ['wings'],
-    palette: ['#ffc800', '#3a2c02', '#ff4b4b'],
+    palette: ['#e0a83c', '#2b2413', '#c4553d'],
     lore: 'Speed alone bores her. She insists on knowing exactly where the speed is pointed.',
     skill: 'Resultant — 12% power when placed in the middle lane.'
   },
@@ -107,7 +107,7 @@ const ROSTER = [
     id: 'thetaform', name: 'Thetaform', title: 'The Third Angle',
     subject: 'math', klass: 'guard', rarity: 4, power: 120,
     form: 'construct', features: ['shield'],
-    palette: ['#58cc02', '#0d2410', '#ffc800'],
+    palette: ['#7fa650', '#1e2416', '#e0a83c'],
     lore: 'Whatever the other two do, it makes the total one hundred and eighty. Every time.',
     skill: 'Supplement — fills 10% of whatever the weakest ally lacks.'
   },
@@ -115,7 +115,7 @@ const ROSTER = [
     id: 'photonet', name: 'Photonet', title: 'Three Hundred Million',
     subject: 'physics', klass: 'attack', rarity: 4, power: 132,
     form: 'sprite', features: ['halo', 'wings'],
-    palette: ['#ffc800', '#3a3202', '#ffffff'],
+    palette: ['#e0a83c', '#2b2613', '#ffffff'],
     lore: 'Arrives before the sound of its own arrival. Massless, tireless, always first.',
     skill: 'First Light — always resolves the opening lane.'
   },
@@ -123,7 +123,7 @@ const ROSTER = [
     id: 'entrope', name: 'Entrope', title: 'Only Increases',
     subject: 'physics', klass: 'guard', rarity: 4, power: 127,
     form: 'beast', features: ['tail', 'horns'],
-    palette: ['#ff9600', '#3a2002', '#8d9bb5'],
+    palette: ['#d07e3a', '#2b1e13', '#a2968a'],
     lore: 'Does not fight so much as wait. Order costs energy; disorder is free and patient.',
     skill: 'Heat Death — drains 6% from every enemy after each lane.'
   },
@@ -131,7 +131,7 @@ const ROSTER = [
     id: 'ohmengar', name: 'Ohmengar', title: 'Voltage Over Current',
     subject: 'physics', klass: 'tech', rarity: 4, power: 121,
     form: 'construct', features: ['visor', 'orbits'],
-    palette: ['#ffc800', '#2a2202', '#1cb0f6'],
+    palette: ['#e0a83c', '#242013', '#6a9cb0'],
     lore: 'Resists exactly as much as it is pushed, and turns the difference into light.',
     skill: 'Resistance — converts 20% of damage taken into lane power.'
   },
@@ -139,7 +139,7 @@ const ROSTER = [
     id: 'isotopia', name: 'Isotopia', title: 'Same but Heavier',
     subject: 'chem', klass: 'guard', rarity: 4, power: 129,
     form: 'elemental', features: ['orbits', 'shield'],
-    palette: ['#ce82ff', '#240c33', '#eaf0fb'],
+    palette: ['#b07cc6', '#251b2c', '#f4efe7'],
     lore: 'Identical to her sisters in every way that reacts, and unmistakable on a mass spectrometer.',
     skill: 'Extra Neutron — 10% power, and 10% slower to act.'
   },
@@ -147,7 +147,7 @@ const ROSTER = [
     id: 'acidra', name: 'Acidra', title: 'pH One',
     subject: 'chem', klass: 'attack', rarity: 4, power: 133,
     form: 'beast', features: ['horns', 'tail'],
-    palette: ['#ff4b4b', '#360b0b', '#ffc800'],
+    palette: ['#c4553d', '#2b1613', '#e0a83c'],
     lore: 'Donates protons to anyone who will take them, and to plenty who would rather not.',
     skill: 'Corrode — strips 12% from Guard class enemies.'
   },
@@ -155,7 +155,7 @@ const ROSTER = [
     id: 'valence', name: 'Valence', title: 'Outer Shell',
     subject: 'chem', klass: 'tech', rarity: 4, power: 123,
     form: 'elemental', features: ['orbits'],
-    palette: ['#2ec4b6', '#052c28', '#ffc800'],
+    palette: ['#59a392', '#16261f', '#e0a83c'],
     lore: 'Counts the electrons nobody else bothers to count, then predicts the entire reaction.',
     skill: 'Bonding — 7% power for each different subject on the team.'
   },
@@ -163,7 +163,7 @@ const ROSTER = [
     id: 'mitosia', name: 'Mitosia', title: 'One Becomes Two',
     subject: 'bio', klass: 'tech', rarity: 4, power: 125,
     form: 'sprite', features: ['halo'],
-    palette: ['#58cc02', '#0e2a0c', '#1cb0f6'],
+    palette: ['#7fa650', '#1f2416', '#6a9cb0'],
     lore: 'Answers every question twice, identically, and considers the matter settled.',
     skill: 'Division — if it wins a lane, 25% of its power carries to the next.'
   },
@@ -171,7 +171,7 @@ const ROSTER = [
     id: 'chloros', name: 'Chloros', title: 'Light Into Sugar',
     subject: 'bio', klass: 'guard', rarity: 4, power: 128,
     form: 'beast', features: ['crown', 'wings'],
-    palette: ['#58cc02', '#0a2408', '#ffc800'],
+    palette: ['#7fa650', '#1e2416', '#e0a83c'],
     lore: 'Turns sunlight into food and the leftovers into the air you are breathing right now.',
     skill: 'Photosynthesis — regains 8% power between lanes.'
   },
@@ -179,7 +179,7 @@ const ROSTER = [
     id: 'apexon', name: 'Apexon', title: 'Top of the Chain',
     subject: 'bio', klass: 'attack', rarity: 4, power: 131,
     form: 'beast', features: ['horns', 'tail', 'crown'],
-    palette: ['#ff9600', '#331d02', '#ff4b4b'],
+    palette: ['#d07e3a', '#2a1f13', '#c4553d'],
     lore: 'Ten percent of the energy makes it up to him, so he makes every bite of it count.',
     skill: 'Trophic — 15% power when the team holds no other Attack.'
   },
@@ -189,7 +189,7 @@ const ROSTER = [
     id: 'printling', name: 'Printling', title: 'Hello There',
     subject: 'code', klass: 'attack', rarity: 3, power: 68,
     form: 'sprite', features: [],
-    palette: ['#58cc02', '#12240a', '#eaf0fb'],
+    palette: ['#7fa650', '#1f2416', '#f4efe7'],
     lore: 'The first spirit anyone ever summons. Says exactly what it is told to say, and nothing more.',
     skill: 'Standard Out — no tricks, no surprises.'
   },
@@ -197,7 +197,7 @@ const ROSTER = [
     id: 'indexid', name: 'Indexid', title: 'Starts at Zero',
     subject: 'code', klass: 'tech', rarity: 3, power: 64,
     form: 'construct', features: ['visor'],
-    palette: ['#1cb0f6', '#07202f', '#eaf0fb'],
+    palette: ['#6a9cb0', '#151e26', '#f4efe7'],
     lore: 'Counts from nothing, which has confused more newcomers than any other creature alive.',
     skill: 'Off By One — 5% power in the first lane, 5% less in the last.'
   },
@@ -205,7 +205,7 @@ const ROSTER = [
     id: 'boolette', name: 'Boolette', title: 'True or Otherwise',
     subject: 'code', klass: 'guard', rarity: 3, power: 62,
     form: 'sprite', features: ['shield'],
-    palette: ['#ffc800', '#2f2603', '#0f1420'],
+    palette: ['#e0a83c', '#282213', '#14110f'],
     lore: 'Has exactly two opinions and holds both of them very firmly, one at a time.',
     skill: 'Short Circuit — stops evaluating once a lane is decided.'
   },
@@ -213,7 +213,7 @@ const ROSTER = [
     id: 'fracton', name: 'Fracton', title: 'Part of a Whole',
     subject: 'math', klass: 'guard', rarity: 3, power: 66,
     form: 'construct', features: ['shield'],
-    palette: ['#1cb0f6', '#062231', '#ffc800'],
+    palette: ['#6a9cb0', '#151e26', '#e0a83c'],
     lore: 'Insists on a common denominator before it will agree to anything at all.',
     skill: 'Common Ground — 5% power when allies share its subject.'
   },
@@ -221,7 +221,7 @@ const ROSTER = [
     id: 'meanling', name: 'Meanling', title: 'Sum Over Count',
     subject: 'math', klass: 'tech', rarity: 3, power: 60,
     form: 'sprite', features: [],
-    palette: ['#58cc02', '#102a10', '#eaf0fb'],
+    palette: ['#7fa650', '#1f2416', '#f4efe7'],
     lore: 'Sits precisely in the middle of everyone, which one outlier can ruin instantly.',
     skill: 'Average — its lane roll always lands near the middle.'
   },
@@ -229,7 +229,7 @@ const ROSTER = [
     id: 'newtonid', name: 'Newtonid', title: 'Equal and Opposite',
     subject: 'physics', klass: 'guard', rarity: 3, power: 67,
     form: 'construct', features: ['shield', 'horns'],
-    palette: ['#ff9600', '#331f02', '#eaf0fb'],
+    palette: ['#d07e3a', '#2a1f13', '#f4efe7'],
     lore: 'Pushes back with exactly the force it is pushed with. Arguing with it is pointless.',
     skill: 'Third Law — returns 10% of the power it loses to.'
   },
@@ -237,7 +237,7 @@ const ROSTER = [
     id: 'joulet', name: 'Joulet', title: 'Never Destroyed',
     subject: 'physics', klass: 'attack', rarity: 3, power: 63,
     form: 'sprite', features: ['halo'],
-    palette: ['#ffc800', '#332a02', '#ff9600'],
+    palette: ['#e0a83c', '#2a2413', '#d07e3a'],
     lore: 'Changes shape constantly and never once goes missing. Check under the heat.',
     skill: 'Conservation — power lost in a lane is added to the next ally.'
   },
@@ -245,7 +245,7 @@ const ROSTER = [
     id: 'moleen', name: 'Moleen', title: 'Six Point Oh Two',
     subject: 'chem', klass: 'tech', rarity: 3, power: 65,
     form: 'elemental', features: ['orbits'],
-    palette: ['#ce82ff', '#210b2e', '#eaf0fb'],
+    palette: ['#b07cc6', '#251b2c', '#f4efe7'],
     lore: 'Never arrives alone. Brings six hundred and two sextillion friends, every single time.',
     skill: 'Avogadro — 4% power for each ally, allies included.'
   },
@@ -253,7 +253,7 @@ const ROSTER = [
     id: 'saltid', name: 'Saltid', title: 'Acid Meets Base',
     subject: 'chem', klass: 'guard', rarity: 3, power: 61,
     form: 'construct', features: ['shield'],
-    palette: ['#eaf0fb', '#1d2537', '#1cb0f6'],
+    palette: ['#f4efe7', '#262019', '#6a9cb0'],
     lore: 'The calm left over when two furious things finish arguing. Also seasons chips.',
     skill: 'Neutralise — reduces enemy skill bonuses by 10% in its lane.'
   },
@@ -261,7 +261,7 @@ const ROSTER = [
     id: 'cellet', name: 'Cellet', title: 'Smallest Living Thing',
     subject: 'bio', klass: 'tech', rarity: 3, power: 66,
     form: 'sprite', features: [],
-    palette: ['#2ec4b6', '#062824', '#58cc02'],
+    palette: ['#59a392', '#16261f', '#7fa650'],
     lore: 'The unit everything alive is built from, and quietly proud of that fact.',
     skill: 'Membrane — lets 5% of incoming power straight through, keeps the rest out.'
   },
@@ -269,7 +269,7 @@ const ROSTER = [
     id: 'enzymo', name: 'Enzymo', title: 'Lock and Key',
     subject: 'bio', klass: 'attack', rarity: 3, power: 64,
     form: 'beast', features: ['tail'],
-    palette: ['#58cc02', '#0d2609', '#ffc800'],
+    palette: ['#7fa650', '#1e2416', '#e0a83c'],
     lore: 'Fits one shape and one shape only, but against that shape it is unstoppable.',
     skill: 'Specific — 18% power against one random enemy lane.'
   },
@@ -277,7 +277,7 @@ const ROSTER = [
     id: 'osmona', name: 'Osmona', title: 'Down the Gradient',
     subject: 'bio', klass: 'guard', rarity: 3, power: 62,
     form: 'elemental', features: [],
-    palette: ['#1cb0f6', '#062331', '#2ec4b6'],
+    palette: ['#6a9cb0', '#151e26', '#59a392'],
     lore: 'Always moves toward whoever needs her most, and never needs to be asked.',
     skill: 'Diffusion — evens out 8% of the power gap in her lane.'
   }

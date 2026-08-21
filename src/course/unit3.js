@@ -2,7 +2,7 @@ export default {
   id: 'u3',
   title: 'Strings',
   subtitle: 'Text, slicing and methods',
-  color: '#ce82ff',
+  color: '#b07cc6',
   icon: 'STR',
   lessons: [
     {

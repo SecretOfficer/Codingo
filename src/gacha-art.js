@@ -2,7 +2,7 @@
    palette, form and feature list, so the app ships no artwork and nothing is borrowed
    from anyone else's game. Deterministic: the same character always draws the same. */
 
-const RARITY_GLOW = { 3: '#8d9bb5', 4: '#1cb0f6', 5: '#ffc800' };
+const RARITY_GLOW = { 3: '#a2968a', 4: '#6a9cb0', 5: '#e0a83c' };
 
 function hash(str) {
   let h = 2166136261;

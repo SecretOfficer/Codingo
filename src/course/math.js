@@ -3,7 +3,7 @@ export const mathUnits = [
     id: 'm1',
     title: 'Numbers & Algebra',
     subtitle: 'Fractions, powers, equations',
-    color: '#1cb0f6',
+    color: '#6a9cb0',
     icon: 'NUM',
     lessons: [
       {
@@ -154,7 +154,7 @@ export const mathUnits = [
     id: 'm2',
     title: 'Geometry & Data',
     subtitle: 'Shapes, angles, averages',
-    color: '#58cc02',
+    color: '#7fa650',
     icon: 'GEO',
     lessons: [
       {

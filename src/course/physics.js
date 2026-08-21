@@ -3,7 +3,7 @@ export const physicsUnits = [
     id: 'p1',
     title: 'Motion & Forces',
     subtitle: 'Speed, gravity, Newton',
-    color: '#ff9600',
+    color: '#d07e3a',
     icon: 'MOV',
     lessons: [
       {
@@ -156,7 +156,7 @@ export const physicsUnits = [
     id: 'p2',
     title: 'Energy & Electricity',
     subtitle: 'Circuits, power, heat',
-    color: '#ffc800',
+    color: '#e0a83c',
     icon: 'AMP',
     lessons: [
       {

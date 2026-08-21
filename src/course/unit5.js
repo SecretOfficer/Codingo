@@ -2,7 +2,7 @@ export default {
   id: 'u5',
   title: 'Lists & Loops',
   subtitle: 'Do it again, and again',
-  color: '#ff4b4b',
+  color: '#c4553d',
   icon: 'FOR',
   lessons: [
     {

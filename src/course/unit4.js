@@ -2,7 +2,7 @@ export default {
   id: 'u4',
   title: 'Logic & Conditions',
   subtitle: 'Making decisions',
-  color: '#ff9600',
+  color: '#d07e3a',
   icon: 'IF',
   lessons: [
     {

@@ -2,7 +2,7 @@ export default {
   id: 'u8',
   title: 'Classes & Errors',
   subtitle: 'Objects, exceptions, modules',
-  color: '#a560ff',
+  color: '#9b6bc0',
   icon: 'OOP',
   lessons: [
     {

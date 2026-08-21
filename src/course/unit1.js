@@ -2,7 +2,7 @@ export default {
   id: 'u1',
   title: 'First Steps',
   subtitle: 'Say hello to Python',
-  color: '#58cc02',
+  color: '#7fa650',
   icon: 'PY',
   lessons: [
     {

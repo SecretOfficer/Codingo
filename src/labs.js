@@ -11,7 +11,7 @@ const circuitLab = {
   id: 'circuit',
   title: 'Circuit Bench',
   subject: 'physics',
-  color: '#ffc800',
+  color: '#e0a83c',
   icon: 'AMP',
   blurb: 'Wire two resistors in series or parallel and watch Ohm law decide the current.',
   concepts: ['Ohm law', 'series and parallel', 'electrical power'],
@@ -41,7 +41,7 @@ const circuitLab = {
   },
   draw(g, w, h, s, d) {
     g.clearRect(0, 0, w, h);
-    const wire = '#7f8ea8';
+    const wire = '#9c8e7e';
     g.lineWidth = 3;
     g.strokeStyle = wire;
     g.font = '13px Consolas, monospace';
@@ -57,7 +57,7 @@ const circuitLab = {
     g.moveTo(L, (T + B) / 2 + 18); g.lineTo(L, B);
     g.stroke();
 
-    g.strokeStyle = '#ffc800';
+    g.strokeStyle = '#e0a83c';
     g.lineWidth = 4;
     g.beginPath();
     g.moveTo(L - 16, (T + B) / 2 - 18); g.lineTo(L + 16, (T + B) / 2 - 18);
@@ -65,20 +65,20 @@ const circuitLab = {
     g.moveTo(L - 16, (T + B) / 2 + 6); g.lineTo(L + 16, (T + B) / 2 + 6);
     g.moveTo(L - 8, (T + B) / 2 + 18); g.lineTo(L + 8, (T + B) / 2 + 18);
     g.stroke();
-    g.fillStyle = '#ffc800';
+    g.fillStyle = '#e0a83c';
     g.fillText(s.v + ' V', L, (T + B) / 2 + 44);
 
     const resistor = (x, y, label, glow) => {
-      g.strokeStyle = '#eaf0fb';
+      g.strokeStyle = '#f4efe7';
       g.lineWidth = 3;
       g.beginPath();
       g.moveTo(x - 40, y);
       for (let k = 0; k < 6; k++) g.lineTo(x - 30 + k * 12, y + (k % 2 ? 11 : -11));
       g.lineTo(x + 40, y);
       g.stroke();
-      g.fillStyle = 'rgba(255,200,0,' + clamp(glow, 0, 0.85) + ')';
+      g.fillStyle = 'rgba(224,168,60,' + clamp(glow, 0, 0.85) + ')';
       g.fillRect(x - 44, y - 18, 88, 36);
-      g.fillStyle = '#8d9bb5';
+      g.fillStyle = '#a2968a';
       g.fillText(label, x, y + 34);
     };
 
@@ -100,7 +100,7 @@ const circuitLab = {
     // moving charge dots, faster with more current
     const t = (Date.now() / 900) % 1;
     const n = 14;
-    g.fillStyle = '#1cb0f6';
+    g.fillStyle = '#6a9cb0';
     for (let k = 0; k < n; k++) {
       const f = ((k / n) + t * clamp(d.i, 0.05, 4)) % 1;
       g.beginPath();
@@ -108,7 +108,7 @@ const circuitLab = {
       g.fill();
     }
 
-    g.fillStyle = '#8d9bb5';
+    g.fillStyle = '#a2968a';
     g.textAlign = 'left';
     g.fillText(s.mode.toUpperCase() + '  |  I = ' + round(d.i, 3) + ' A', 14, h - 16);
   },
@@ -142,7 +142,7 @@ const projectileLab = {
   id: 'projectile',
   title: 'Projectile Range',
   subject: 'physics',
-  color: '#ff9600',
+  color: '#d07e3a',
   icon: 'ARC',
   blurb: 'Launch a ball, watch the parabola, and find the angle that carries it furthest.',
   concepts: ['projectile motion', 'gravity', 'vectors'],
@@ -176,21 +176,21 @@ const projectileLab = {
     const sx = (x) => 40 + (x / spanX) * (w - 70);
     const sy = (y) => ground - (y / spanY) * (ground - 30);
 
-    g2.strokeStyle = '#2a3448';
+    g2.strokeStyle = '#3a322a';
     g2.lineWidth = 2;
     g2.beginPath(); g2.moveTo(30, ground); g2.lineTo(w - 15, ground); g2.stroke();
 
     // target zone
-    g2.fillStyle = d.hit ? 'rgba(88,204,2,.35)' : 'rgba(255,75,75,.22)';
+    g2.fillStyle = d.hit ? 'rgba(127,166,80,.35)' : 'rgba(196,85,61,.22)';
     g2.fillRect(sx(d.target - 1), ground - 10, Math.max(6, sx(d.target + 1) - sx(d.target - 1)), 10);
-    g2.fillStyle = '#8d9bb5';
+    g2.fillStyle = '#a2968a';
     g2.font = '12px Consolas, monospace';
     g2.textAlign = 'center';
     g2.fillText('target', sx(d.target), ground + 20);
 
     // trajectory
     const rad = (s.angle * Math.PI) / 180;
-    g2.strokeStyle = '#ff9600';
+    g2.strokeStyle = '#d07e3a';
     g2.lineWidth = 3;
     g2.beginPath();
     for (let k = 0; k <= 80; k++) {
@@ -206,11 +206,11 @@ const projectileLab = {
     const t = ((Date.now() / 1000) % d.flight);
     const bx = s.v * Math.cos(rad) * t;
     const by = Math.max(0, s.v * Math.sin(rad) * t - 0.5 * d.g * t * t);
-    g2.fillStyle = '#eaf0fb';
+    g2.fillStyle = '#f4efe7';
     g2.beginPath(); g2.arc(sx(bx), sy(by), 6, 0, Math.PI * 2); g2.fill();
 
     // launch vector
-    g2.strokeStyle = '#1cb0f6';
+    g2.strokeStyle = '#6a9cb0';
     g2.lineWidth = 2;
     g2.beginPath();
     g2.moveTo(sx(0), sy(0));
@@ -218,7 +218,7 @@ const projectileLab = {
     g2.stroke();
 
     g2.textAlign = 'left';
-    g2.fillStyle = '#8d9bb5';
+    g2.fillStyle = '#a2968a';
     g2.fillText('range ' + round(d.range, 1) + ' m', 14, 22);
   },
   challenges: [
@@ -251,7 +251,7 @@ const titrationLab = {
   id: 'titration',
   title: 'Titration Bench',
   subject: 'chem',
-  color: '#ce82ff',
+  color: '#b07cc6',
   icon: 'pH',
   blurb: 'Add alkali to 50 mL of acid drop by drop and watch the pH curve turn over.',
   concepts: ['pH scale', 'neutralisation', 'concentration'],
@@ -282,24 +282,24 @@ const titrationLab = {
     ];
   },
   phColor(ph) {
-    if (ph < 3) return '#ff4b4b';
-    if (ph < 6) return '#ff9600';
-    if (ph < 6.8) return '#ffc800';
-    if (ph <= 7.2) return '#58cc02';
-    if (ph < 10) return '#1cb0f6';
-    return '#a560ff';
+    if (ph < 3) return '#c4553d';
+    if (ph < 6) return '#d07e3a';
+    if (ph < 6.8) return '#e0a83c';
+    if (ph <= 7.2) return '#7fa650';
+    if (ph < 10) return '#6a9cb0';
+    return '#9b6bc0';
   },
   draw(g, w, h, s, d) {
     g.clearRect(0, 0, w, h);
     const self = titrationLab;
 
     // burette
-    g.fillStyle = '#2a3448';
+    g.fillStyle = '#3a322a';
     g.fillRect(80, 12, 16, 120);
-    g.fillStyle = '#1cb0f6';
+    g.fillStyle = '#6a9cb0';
     const fill = clamp(1 - s.vb / 100, 0, 1);
     g.fillRect(80, 12 + 120 * (1 - fill), 16, 120 * fill);
-    g.fillStyle = '#8d9bb5';
+    g.fillStyle = '#a2968a';
     g.font = '12px Consolas, monospace';
     g.textAlign = 'left';
     g.fillText(s.vb + ' mL added', 104, 26);
@@ -307,7 +307,7 @@ const titrationLab = {
     // falling drop
     if (s.vb > 0) {
       const t = (Date.now() / 700) % 1;
-      g.fillStyle = '#1cb0f6';
+      g.fillStyle = '#6a9cb0';
       g.beginPath();
       g.arc(88, 136 + t * 46, 4, 0, Math.PI * 2);
       g.fill();
@@ -315,7 +315,7 @@ const titrationLab = {
 
     // beaker
     const bx = 52, by = 190, bw = 76, bh = 92;
-    g.strokeStyle = '#7f8ea8';
+    g.strokeStyle = '#9c8e7e';
     g.lineWidth = 3;
     g.beginPath();
     g.moveTo(bx, by); g.lineTo(bx, by + bh); g.lineTo(bx + bw, by + bh); g.lineTo(bx + bw, by);
@@ -325,27 +325,27 @@ const titrationLab = {
     g.globalAlpha = 0.75;
     g.fillRect(bx + 2, by + bh - bh * liquid, bw - 4, bh * liquid - 2);
     g.globalAlpha = 1;
-    g.fillStyle = '#eaf0fb';
+    g.fillStyle = '#f4efe7';
     g.textAlign = 'center';
     g.font = 'bold 15px Consolas, monospace';
     g.fillText('pH ' + round(d.ph, 2), bx + bw / 2, by + bh + 24);
 
     // titration curve
     const gx = 200, gy = 30, gw = w - gx - 30, gh = h - 90;
-    g.strokeStyle = '#2a3448';
+    g.strokeStyle = '#3a322a';
     g.lineWidth = 2;
     g.strokeRect(gx, gy, gw, gh);
-    g.fillStyle = '#8d9bb5';
+    g.fillStyle = '#a2968a';
     g.font = '11px Consolas, monospace';
     g.textAlign = 'right';
     [0, 7, 14].forEach((p) => {
       const y = gy + gh - (p / 14) * gh;
       g.fillText(String(p), gx - 6, y + 4);
-      g.strokeStyle = p === 7 ? '#3b4a66' : '#1d2537';
+      g.strokeStyle = p === 7 ? '#4a4036' : '#262019';
       g.beginPath(); g.moveTo(gx, y); g.lineTo(gx + gw, y); g.stroke();
     });
 
-    g.strokeStyle = '#ce82ff';
+    g.strokeStyle = '#b07cc6';
     g.lineWidth = 3;
     g.beginPath();
     for (let k = 0; k <= 100; k++) {
@@ -361,7 +361,7 @@ const titrationLab = {
     g.fillStyle = self.phColor(d.ph);
     g.beginPath(); g.arc(px, py, 6, 0, Math.PI * 2); g.fill();
 
-    g.fillStyle = '#8d9bb5';
+    g.fillStyle = '#a2968a';
     g.textAlign = 'center';
     g.fillText('alkali added (mL)', gx + gw / 2, gy + gh + 22);
   },
@@ -395,7 +395,7 @@ const grapherLab = {
   id: 'grapher',
   title: 'Quadratic Grapher',
   subject: 'math',
-  color: '#1cb0f6',
+  color: '#6a9cb0',
   icon: 'f(x)',
   blurb: 'Bend a parabola with its coefficients and match the mystery curve.',
   concepts: ['quadratics', 'roots', 'vertex form'],
@@ -432,7 +432,7 @@ const grapherLab = {
     const sx = (x) => w / 2 + (x / spanX) * (w / 2 - 20);
     const sy = (y) => h / 2 - (y / spanY) * (h / 2 - 20);
 
-    g.strokeStyle = '#1d2537';
+    g.strokeStyle = '#262019';
     g.lineWidth = 1;
     for (let x = -spanX; x <= spanX; x++) {
       g.beginPath(); g.moveTo(sx(x), 0); g.lineTo(sx(x), h); g.stroke();
@@ -440,7 +440,7 @@ const grapherLab = {
     for (let y = -spanY; y <= spanY; y += 2) {
       g.beginPath(); g.moveTo(0, sy(y)); g.lineTo(w, sy(y)); g.stroke();
     }
-    g.strokeStyle = '#3b4a66';
+    g.strokeStyle = '#4a4036';
     g.lineWidth = 2;
     g.beginPath(); g.moveTo(0, sy(0)); g.lineTo(w, sy(0)); g.stroke();
     g.beginPath(); g.moveTo(sx(0), 0); g.lineTo(sx(0), h); g.stroke();
@@ -461,17 +461,17 @@ const grapherLab = {
     };
 
     const t = grapherLab.target;
-    plot(t.a, t.b, t.c, 'rgba(206,130,255,.45)', 6);
-    plot(s.a, s.b, s.c, d.matched ? '#58cc02' : '#1cb0f6', 3);
+    plot(t.a, t.b, t.c, 'rgba(176,124,198,.45)', 6);
+    plot(s.a, s.b, s.c, d.matched ? '#7fa650' : '#6a9cb0', 3);
 
-    g.fillStyle = '#ffc800';
+    g.fillStyle = '#e0a83c';
     d.roots.forEach((r) => {
       g.beginPath(); g.arc(sx(r), sy(0), 5, 0, Math.PI * 2); g.fill();
     });
-    g.fillStyle = '#ff4b4b';
+    g.fillStyle = '#c4553d';
     g.beginPath(); g.arc(sx(d.vx), sy(d.vy), 5, 0, Math.PI * 2); g.fill();
 
-    g.fillStyle = '#8d9bb5';
+    g.fillStyle = '#a2968a';
     g.font = '12px Consolas, monospace';
     g.textAlign = 'left';
     g.fillText('faint curve = mystery target', 12, 20);
@@ -506,7 +506,7 @@ const punnettLab = {
   id: 'punnett',
   title: 'Punnett Square',
   subject: 'bio',
-  color: '#2ec4b6',
+  color: '#59a392',
   icon: 'DNA',
   blurb: 'Cross two parents and read the genotype and phenotype ratios off the grid.',
   concepts: ['alleles', 'dominant and recessive', 'inheritance ratios'],
@@ -550,11 +550,11 @@ const punnettLab = {
     g.textBaseline = 'middle';
 
     d.b.forEach((letter, i) => {
-      g.fillStyle = '#1cb0f6';
+      g.fillStyle = '#6a9cb0';
       g.fillText(letter, ox + cell * i + cell / 2, oy - 22);
     });
     d.a.forEach((letter, i) => {
-      g.fillStyle = '#ff9600';
+      g.fillStyle = '#d07e3a';
       g.fillText(letter, ox - 26, oy + cell * i + cell / 2);
     });
 
@@ -562,19 +562,19 @@ const punnettLab = {
       const r = Math.floor(idx / 2), c = idx % 2;
       const x = ox + c * cell, y = oy + r * cell;
       const recessive = pair === 'bb';
-      g.fillStyle = recessive ? 'rgba(255,75,75,.18)' : 'rgba(46,196,182,.18)';
+      g.fillStyle = recessive ? 'rgba(196,85,61,.18)' : 'rgba(89,163,146,.18)';
       g.fillRect(x, y, cell - 4, cell - 4);
-      g.strokeStyle = '#2a3448';
+      g.strokeStyle = '#3a322a';
       g.lineWidth = 2;
       g.strokeRect(x, y, cell - 4, cell - 4);
-      g.fillStyle = recessive ? '#ff4b4b' : '#eaf0fb';
+      g.fillStyle = recessive ? '#c4553d' : '#f4efe7';
       g.fillText(pair, x + (cell - 4) / 2, y + (cell - 4) / 2);
     });
 
     g.textAlign = 'left';
     g.textBaseline = 'alphabetic';
     g.font = '13px Consolas, monospace';
-    g.fillStyle = '#8d9bb5';
+    g.fillStyle = '#a2968a';
     g.fillText('B = dominant, b = recessive', 14, h - 16);
   },
   challenges: [
@@ -607,7 +607,7 @@ export const pythonLab = {
   id: 'pylab',
   title: 'Python Sandbox',
   subject: 'code',
-  color: '#58cc02',
+  color: '#7fa650',
   icon: '</>',
   blurb: 'A free editor wired to the Python on this machine, with four challenges to clear.',
   concepts: ['running code', 'loops', 'strings', 'functions'],
