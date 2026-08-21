@@ -73,7 +73,7 @@ screen shake. No audio or image files ship with the app: every sound is generate
 oscillator at play time and every effect is drawn on one overlay canvas. Sound and animation each have an
 off switch in Settings.
 
-**22 badges** unlock as you play — first lesson, flawless run, x2 combo, ten speed bonuses, a seven-day
+**30 badges** unlock as you play — first lesson, flawless run, x2 combo, ten speed bonuses, a seven-day
 streak, a lesson in every subject, every lab cleared, a Debug Duel win, Diamond tier, beating an opponent
 rated 200 points above you, and more. Each is worth 20 gems and they are all listed, locked and unlocked,
 at the bottom of the Progress tab.
@@ -112,6 +112,29 @@ until everything in it has been answered correctly at least once.
 - **Opponent model**: opponents are simulated from the ladder, not networked. Their solve time and
   success chance come from their rating and the problem's difficulty, and their progress bar ticks in
   real time during the duel. This is the one place the app is honest about not having a backend.
+
+## Codex — the collection layer
+
+`Codex` tab. A summoning and team-battle system whose only currency is gems earned by studying.
+
+- **33 original spirits**, each personifying an idea from the course — Nullwyrm the undefined,
+  Recursa who calls herself, Primearch the indivisible, Entrope who only increases. Every one has lore
+  and a skill line that restates the concept, so a pull doubles as revision. Nothing is borrowed from
+  another game: the artwork is **procedural SVG**, generated from each character's palette, form and
+  feature list, so the app ships no image files.
+- **Summoning** costs 60 gems for one or 540 for ten. Rates are 2% for five star, 13% for four star,
+  and pity is real: a four star at least every 10 pulls and a guaranteed five star at 40. Duplicates
+  awaken a spirit for +8% power up to six times and refund gems.
+- **Teams of three** in lanes. Subject synergy pays: three of one discipline is +20%, three different
+  ones +12%. Class is a cycle — Attack beats Tech, Tech beats Guard, Guard beats Attack — worth 25% in
+  a lane, so the *order* you place them in is the real decision.
+- **Lane battles** resolve one lane at a time against a rival team scaled to your own strength. Win two
+  of three and you take one of their spirits, preferring one you do not own yet.
+- **Focus tickets** are the bridge back to learning: one per lesson completed and one per lab challenge
+  cleared, capped at ten, and each battle costs one. Your team also grants a **lesson XP bonus** of up to
+  25%, so the collection makes studying faster and studying is the only thing that grows the collection.
+- Rolls, team power, opponent generation, battle resolution and the prize are all decided in the main
+  process, exactly like the duel rating.
 
 ## Real-time progress tracking and feedback
 
@@ -171,8 +194,11 @@ src/styles.css       all styling, including high-contrast and reduced-motion mod
 src/app.js           renderer: routing, worlds path, lesson engine, labs shell, dashboard, SDG page
 src/arena-ui.js      renderer: rank card, queue, the three duel screens, leaderboard
 src/labs.js          the six simulations: parameters, physics/chemistry/maths, drawing, challenges
+gacha-engine.js      Codex roster, pull rates with pity, team power, lane battle resolution
+src/codex-ui.js      renderer: summon banner, reveal, collection, team builder, lane battles
+src/gacha-art.js     procedural SVG portraits, drawn from each character's own parameters
 src/juice.js         synthesised sound, particles, floating numbers, shakes and slams
-src/achievements.js  the 22 badges, each a pure predicate over saved state
+src/achievements.js  the 30 badges, each a pure predicate over saved state
 src/course/          content, one file per subject, plus an index that adds unit reviews and worlds
 scripts/verify.js    the content gate run by CI before any build
 scripts/make-icon.js draws build/icon.png from scratch and encodes the PNG by hand

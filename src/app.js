@@ -3,6 +3,7 @@ import {
 } from './course/index.js';
 import { labs, getLab, labState } from './labs.js';
 import { createArena } from './arena-ui.js';
+import { createCodex } from './codex-ui.js';
 import * as fx from './juice.js';
 import { BADGES, evaluate, tierRank } from './achievements.js';
 
@@ -114,6 +115,10 @@ async function initState() {
   S.settings = Object.assign({ fontScale: 1, contrast: false, motion: true, sound: true }, S.settings || {});
   S.badges = S.badges || [];
   S.counters = Object.assign({ quick: 0, bestCombo: 0, labChallenges: 0 }, S.counters || {});
+  S.gacha = Object.assign({
+    owned: {}, team: [], pity: { since5: 0, since4: 0 }, pulls: 0, fiveStars: 0,
+    tickets: 3, battles: { wins: 0, losses: 0 }, log: [], stolen: 0, xpBonus: 0
+  }, S.gacha || {});
   S.arena = Object.assign({
     player: { id: 'me', name: 'You', rating: 1500, rd: 350, vol: 0.06, wins: 0, losses: 0, draws: 0, streak: 0, best: 1500 },
     pool: [], placements: 0, placed: false,
@@ -316,6 +321,7 @@ function touchStreak() {
 function go(viewName, arg) {
   if (labRuntime) { cancelAnimationFrame(labRuntime.raf); labRuntime = null; }
   if (arenaUi) arenaUi.leave();
+  if (codexUi) codexUi.leave();
   route = { view: viewName, arg: arg || null };
   paintTopbar();
   paintTitle();
@@ -325,6 +331,7 @@ function go(viewName, arg) {
   else if (viewName === 'lab') renderLab(arg);
   else if (viewName === 'arena') arenaUi.renderArena();
   else if (viewName === 'ladder') arenaUi.renderLadder();
+  else if (viewName === 'codex') codexUi.render();
   else if (viewName === 'progress') renderProgress();
   else if (viewName === 'sdg') renderSdg();
   view.scrollTop = 0;
@@ -1429,7 +1436,10 @@ async function finishLesson() {
   let xp = lesson.review ? 20 : 10;
   if (perfect) xp += 5;
   if (wasNew) xp += 5;
+  const teamBonus = Math.round(xp * ((S.gacha.xpBonus || 0) / 100));
+  xp += teamBonus;
   const gems = perfect ? 15 : 5;
+  grantTicket('lesson complete');
 
   S.lessons[lesson.id] = {
     crowns,
@@ -1465,7 +1475,7 @@ async function finishLesson() {
       <h1>${perfect ? 'Flawless lesson' : 'Lesson complete'}</h1>
       <p>${esc(subject.name)} &middot; ${esc(unit.title)} &middot; ${esc(lesson.title)} &middot; ${minutes} min</p>
       <div class="award-row">
-        <div class="award xp"><div class="k">XP earned</div><div class="v">+${xp + session.xpEarned}</div></div>
+        <div class="award xp"><div class="k">XP earned</div><div class="v">+${xp + session.xpEarned}</div>${teamBonus ? `<div class="award-note">incl. +${teamBonus} from your Codex team</div>` : ''}</div>
         <div class="award acc"><div class="k">Accuracy</div><div class="v">${accuracy}%</div></div>
         <div class="award crown"><div class="k">Crowns</div><div class="v">${crowns}/${MAX_CROWNS}</div></div>
         <div class="award"><div class="k">Best combo</div><div class="v">x${comboMultiplier(session.bestCombo)}</div></div>
@@ -1636,6 +1646,8 @@ function renderLab(labId) {
     fx.play('complete');
     fx.confetti(60);
     toast('Challenge cleared  +' + gained + ' XP');
+    grantTicket('lab challenge');
+    await save();
     checkBadges();
     return true;
   };
@@ -2018,6 +2030,24 @@ const arenaUi = createArena({
   checkBadges
 });
 
+const codexUi = createCodex({
+  esc, view, api, toast, fx,
+  state: () => S,
+  save: () => save(),
+  paintTopbar,
+  openModal,
+  closeModal,
+  checkBadges
+});
+
+/** Focus tickets are the bridge: studying is the only way to earn a battle. */
+function grantTicket(reason) {
+  const g = S.gacha;
+  if ((g.tickets || 0) >= codexUi.TICKET_MAX) return;
+  g.tickets = (g.tickets || 0) + 1;
+  toast('+1 focus ticket  (' + reason + ')');
+}
+
 /* =========================================================== keyboard */
 
 document.addEventListener('keydown', (e) => {
@@ -2053,7 +2083,7 @@ document.addEventListener('keydown', (e) => {
 
 const VIEW_TITLES = {
   home: 'Learn', path: 'Learn', lesson: 'Lesson', labs: 'Virtual Labs', lab: 'Virtual Labs',
-  arena: 'Arena', ladder: 'Leaderboard', progress: 'Progress', sdg: 'Impact'
+  arena: 'Arena', ladder: 'Leaderboard', codex: 'Codex', progress: 'Progress', sdg: 'Impact'
 };
 
 function paintTitle() {

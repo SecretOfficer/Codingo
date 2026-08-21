@@ -111,6 +111,41 @@ export const BADGES = [
     id: 'scholar', name: 'Scholar', icon: '90',
     desc: 'Hold 90% accuracy over at least 50 answers',
     check: (s, ctx) => ctx.answers >= 50 && ctx.accuracy >= 90
+  },
+  {
+    id: 'first_summon', name: 'First Summon', icon: 'SUM',
+    desc: 'Summon your first spirit in the Codex',
+    check: (s) => (s.gacha.pulls || 0) >= 1
+  },
+  {
+    id: 'five_star', name: 'Legendary', icon: '5*',
+    desc: 'Summon a five star spirit',
+    check: (s) => (s.gacha.fiveStars || 0) >= 1
+  },
+  {
+    id: 'full_team', name: 'Three Strong', icon: 'TM3',
+    desc: 'Field a complete team of three',
+    check: (s) => (s.gacha.team || []).length === 3
+  },
+  {
+    id: 'battle_win', name: 'Lane Winner', icon: 'LN1',
+    desc: 'Win a Codex lane battle',
+    check: (s) => ((s.gacha.battles || {}).wins || 0) >= 1
+  },
+  {
+    id: 'raider', name: 'Raider', icon: 'x5',
+    desc: 'Claim five spirits from rival teams',
+    check: (s) => (s.gacha.stolen || 0) >= 5
+  },
+  {
+    id: 'collector', name: 'Collector', icon: '15',
+    desc: 'Collect fifteen different spirits',
+    check: (s) => Object.keys(s.gacha.owned || {}).length >= 15
+  },
+  {
+    id: 'awakener', name: 'Awakener', icon: 'AWK',
+    desc: 'Awaken one spirit three times with duplicates',
+    check: (s) => Object.values(s.gacha.owned || {}).some((e) => (e.copies || 0) >= 4)
   }
 ];
 

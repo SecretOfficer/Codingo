@@ -282,6 +282,33 @@ ipcMain.handle('arena:rate', (_e, payload) => {
   return { me, opponent };
 });
 
+/* ------------------------------------------------------------ codex ipc */
+
+const gacha = require('./gacha-engine');
+
+ipcMain.handle('gacha:roster', () => ({
+  roster: gacha.ROSTER,
+  rates: gacha.RATES,
+  pity5: gacha.PITY_5,
+  pity4: gacha.PITY_4,
+  pullCost: gacha.PULL_COST,
+  multiCost: gacha.MULTI_COST,
+  awakenStep: gacha.AWAKEN_STEP,
+  awakenMax: gacha.AWAKEN_MAX
+}));
+
+// Rolls happen here so the summon screen cannot decide its own five stars.
+ipcMain.handle('gacha:pull', (_e, payload) => gacha.pull(payload.count, payload.pity || {}, payload.owned || {}));
+
+ipcMain.handle('gacha:teamPower', (_e, entries) => {
+  const resolved = entries.map((e) => ({ char: gacha.byId(e.id), copies: e.copies }));
+  if (resolved.some((r) => !r.char)) return null;
+  return gacha.teamPower(resolved);
+});
+
+ipcMain.handle('gacha:battle', (_e, payload) =>
+  gacha.runBattle(payload.team, payload.owned, payload.opponentName));
+
 // Teacher / learner report: a JSON snapshot plus a flat CSV of per-topic mastery,
 // so progress can leave the app and be looked at by someone else.
 ipcMain.handle('report:export', async (_e, payload) => {

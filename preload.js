@@ -18,6 +18,13 @@ contextBridge.exposeInMainWorld('codingo', {
   runPython: (code, stdin, timeoutMs) => ipcRenderer.invoke('python:run', { code, stdin, timeoutMs }),
   exportReport: (payload) => ipcRenderer.invoke('report:export', payload),
 
+  gacha: {
+    roster: () => ipcRenderer.invoke('gacha:roster'),
+    pull: (count, pity, owned) => ipcRenderer.invoke('gacha:pull', { count, pity, owned }),
+    teamPower: (entries) => ipcRenderer.invoke('gacha:teamPower', entries),
+    battle: (team, owned, opponentName) => ipcRenderer.invoke('gacha:battle', { team, owned, opponentName })
+  },
+
   arena: {
     newPool: (size) => ipcRenderer.invoke('arena:newPool', size),
     drift: (pool, days) => ipcRenderer.invoke('arena:drift', { pool, days }),

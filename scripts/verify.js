@@ -209,6 +209,132 @@ async function main() {
     check(!('tests' in view), `duel ${p.id}: public view leaks the tests`);
   });
 
+  /* ------------------------------------------------------------- codex */
+
+  const gacha = require(path.join(ROOT, 'gacha-engine.js'));
+  const art = await import(pathToFileURL(path.join(ROOT, 'src', 'gacha-art.js')).href);
+
+  const charIds = new Set();
+  const perRarity = { 3: 0, 4: 0, 5: 0 };
+  gacha.ROSTER.forEach((c) => {
+    check(!charIds.has(c.id), `duplicate character id ${c.id}`);
+    charIds.add(c.id);
+    check([3, 4, 5].includes(c.rarity), `${c.id}: bad rarity`);
+    perRarity[c.rarity] = (perRarity[c.rarity] || 0) + 1;
+    check(gacha.SUBJECTS.includes(c.subject), `${c.id}: unknown subject "${c.subject}"`);
+    check(gacha.CLASSES.includes(c.klass), `${c.id}: unknown class "${c.klass}"`);
+    check(c.palette.length === 3 && c.palette.every((h) => /^#[0-9a-f]{6}$/i.test(h)),
+      `${c.id}: palette must be three hex colours`);
+    check(c.lore.length > 30 && c.skill.length > 10, `${c.id}: lore or skill text too thin`);
+    check(!!c.title && !!c.name, `${c.id}: missing name or title`);
+
+    // Power must not overlap between rarities, or the ladder of value collapses.
+    if (c.rarity === 5) check(c.power >= 190, `${c.id}: five star under 190 power`);
+    if (c.rarity === 4) check(c.power >= 118 && c.power <= 140, `${c.id}: four star outside 118-140`);
+    if (c.rarity === 3) check(c.power >= 55 && c.power <= 75, `${c.id}: three star outside 55-75`);
+
+    const svg = art.portrait(c, { size: 100 });
+    check(svg.startsWith('\n<svg') || svg.trim().startsWith('<svg'), `${c.id}: portrait is not an svg`);
+    check(!svg.includes('undefined') && !svg.includes('NaN'), `${c.id}: portrait has holes in it`);
+  });
+  check(perRarity[5] >= 4 && perRarity[4] >= 8 && perRarity[3] >= 8,
+    `roster is lopsided: ${JSON.stringify(perRarity)}`);
+  gacha.CLASSES.forEach((k) => check(gacha.ROSTER.some((c) => c.klass === k && c.rarity === 3),
+    `no three star ${k}, so a beginner cannot answer that class`));
+
+  // Simulate a long pull history: rates should land near the advertised numbers and
+  // pity must never be exceeded.
+  let pity = { since5: 0, since4: 0 };
+  const ownedSim = {};
+  const counts = { 3: 0, 4: 0, 5: 0 };
+  let longest5 = 0;
+  let longest4 = 0;
+  let run5 = 0;
+  let run4 = 0;
+  for (let i = 0; i < 4000; i++) {
+    const res = gacha.pull(1, pity, ownedSim);
+    pity = res.pity;
+    const r = res.results[0];
+    counts[r.rarity]++;
+    ownedSim[r.id] = true;
+    run5 = r.rarity === 5 ? 0 : run5 + 1;
+    run4 = r.rarity >= 4 ? 0 : run4 + 1;
+    longest5 = Math.max(longest5, run5);
+    longest4 = Math.max(longest4, run4);
+  }
+  const rate5 = counts[5] / 4000;
+  const rate4 = counts[4] / 4000;
+  check(rate5 >= gacha.RATES[5] * 0.7 && rate5 <= gacha.RATES[5] * 2.2,
+    `five star rate off: ${(rate5 * 100).toFixed(2)}% against an advertised ${(gacha.RATES[5] * 100).toFixed(0)}%`);
+  check(rate4 >= gacha.RATES[4] * 0.7 && rate4 <= gacha.RATES[4] * 2.2,
+    `four star rate off: ${(rate4 * 100).toFixed(2)}%`);
+  check(longest5 < gacha.PITY_5, `went ${longest5} pulls without a five star, pity is ${gacha.PITY_5}`);
+  check(longest4 < gacha.PITY_4, `went ${longest4} pulls without a four star, pity is ${gacha.PITY_4}`);
+
+  // Class triangle must be a genuine cycle.
+  gacha.CLASSES.forEach((k) => {
+    const beaten = gacha.BEATS[k];
+    check(gacha.classMultiplier(k, beaten) > 1, `${k} should beat ${beaten}`);
+    check(gacha.classMultiplier(beaten, k) < 1, `${beaten} should lose to ${k}`);
+    check(gacha.classMultiplier(k, k) === 1, `${k} against itself should be neutral`);
+  });
+
+  // Awakening and synergy behave monotonically.
+  const sample = gacha.ROSTER[0];
+  check(gacha.characterPower(sample, 3) > gacha.characterPower(sample, 1), 'duplicates must raise power');
+  check(gacha.characterPower(sample, 20) === gacha.characterPower(sample, 1 + gacha.AWAKEN_MAX),
+    'awakening must cap out');
+
+  const same = [0, 1, 2].map(() => ({ char: gacha.ROSTER.find((c) => c.subject === 'code'), copies: 1 }));
+  check(gacha.teamSynergy(same.map((e) => e.char)).mult > 1.15, 'single discipline bonus missing');
+
+  // A stronger team should win far more often than it loses.
+  const strong = [gacha.ROSTER[0], gacha.ROSTER[1], gacha.ROSTER[2]]
+    .map((c) => ({ id: c.id, klass: c.klass, power: c.power }));
+  const weak = gacha.ROSTER.filter((c) => c.rarity === 3).slice(0, 3)
+    .map((c) => ({ id: c.id, klass: c.klass, power: c.power }));
+  let strongWins = 0;
+  for (let i = 0; i < 400; i++) if (gacha.resolveBattle(strong, weak).won) strongWins++;
+  check(strongWins >= 380, `power should decide battles: strong team won only ${strongWins}/400`);
+
+  let coinflips = 0;
+  for (let i = 0; i < 400; i++) if (gacha.resolveBattle(strong, strong.slice()).won) coinflips++;
+  check(coinflips > 120 && coinflips < 280, `mirror match should be near even, got ${coinflips}/400`);
+
+  const foe = gacha.makeOpponentTeam(600, 'Test');
+  check(foe.team.length === 3, 'opponent team must have three members');
+  check(new Set(foe.team.map((t) => t.id)).size === 3, 'opponent team has duplicates');
+
+  // A full battle through the same path the app uses must be close to a coin flip:
+  // matchmaking scales the rival to the player, so neither side may be handicapped.
+  const sampleTeams = [
+    ['nullwyrm', 'primearch', 'recursa'],
+    ['printling', 'cellet', 'fracton'],
+    ['photonet', 'acidra', 'isotopia']
+  ];
+  sampleTeams.forEach((ids) => {
+    const entries = ids.map((id) => ({ id, copies: 1 }));
+    let wins = 0;
+    let laneWins = 0;
+    for (let i = 0; i < 600; i++) {
+      const r = gacha.runBattle(entries, {}, 'Test');
+      if (!r) { problems.push('runBattle returned nothing for ' + ids.join(', ')); return; }
+      if (r.won) wins++;
+      laneWins += r.myWins;
+      if (r.won) check(!!r.prize, 'a won battle must award a prize');
+    }
+    const rate = wins / 600;
+    checks++;
+    if (rate < 0.35 || rate > 0.65) {
+      problems.push(`battle balance is skewed for [${ids.join(', ')}]: won ${(rate * 100).toFixed(1)}% of 600`);
+    }
+    check(laneWins / 1800 > 0.35 && laneWins / 1800 < 0.65,
+      `lane win share skewed for [${ids.join(', ')}]: ${(laneWins / 1800 * 100).toFixed(1)}%`);
+  });
+
+  check(gacha.runBattle([{ id: 'not_a_character', copies: 1 }], {}, 'x') === null,
+    'runBattle must reject an unknown character instead of guessing');
+
   /* ------------------------------------------------------ rating engine */
 
   const ref = arena.rate({ rating: 1500, rd: 200, vol: 0.06 }, [
