@@ -53,6 +53,7 @@
       "preload.js",
       "arena-engine.js",
       "arena-problems.js",
+      "gacha-engine.js",
       "src/**/*",
       "build/icon.png",
       "!**/*.map"

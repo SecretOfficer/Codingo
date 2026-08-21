@@ -359,6 +359,19 @@ async function main() {
   pkg.build.files.filter((f) => !f.startsWith('!') && !f.includes('*'))
     .forEach((f) => check(fs.existsSync(path.join(ROOT, f)), `packaged file "${f}" does not exist`));
 
+  // Anything main.js requires from the project root must be inside build.files, or the
+  // packaged app dies on startup while the dev run stays perfectly happy.
+  const mainSource = fs.readFileSync(path.join(ROOT, 'main.js'), 'utf8');
+  const localRequires = [...mainSource.matchAll(/require\(['"]\.\/([^'"]+)['"]\)/g)].map((m) => m[1]);
+  check(localRequires.length > 0, 'could not read main.js requires');
+  localRequires.forEach((rel) => {
+    const file = rel.endsWith('.js') ? rel : rel + '.js';
+    check(fs.existsSync(path.join(ROOT, file)), `main.js requires missing file ${file}`);
+    const packaged = pkg.build.files.some((pattern) =>
+      pattern === file || pattern === rel || pattern.includes('**'));
+    check(packaged, `main.js requires "${file}" but build.files does not ship it`);
+  });
+
   /* ------------------------------------------------------------ report */
 
   console.log(`lessons ${lessonIds.size}  exercises ${exerciseCount}  labs ${labsMod.labs.length}  duel problems ${duelIds.size}`);
