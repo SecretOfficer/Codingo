@@ -1,0 +1,214 @@
+# Codingo
+
+A gamified e-learning desktop platform that teaches STEM and coding to school students through
+interactive gameplay, live progress tracking and virtual labs. Built with Electron; runs fully offline.
+
+## Running it
+
+```bash
+npm install     # first time only
+npm start
+```
+
+`npm run dev` starts the same app with DevTools open. Python is optional but recommended: it powers the
+write-code exercises and the Python sandbox lab.
+
+## Building a release
+
+```bash
+npm run verify        # 2300+ checks over every exercise, lab, duel problem and the rating engine
+npm run icon          # regenerate build/icon.png (no image tools needed)
+npm run dist:win      # NSIS installer + portable exe into release/
+npm run dist:zip      # zip build that needs no code-signing tools
+npm run pack          # unpacked app in release/win-unpacked for quick testing
+```
+
+Pushing a `v*` tag runs `.github/workflows/release.yml`, which verifies the content on Linux, builds the
+Windows installer, and attaches the artifacts to a GitHub release.
+
+On a Windows machine without Developer Mode, `dist:win` can fail while unpacking electron-builder's
+code-signing tools (it contains macOS symlinks). `npm run dist:zip` avoids that path; CI builds the
+installer properly.
+
+## What is inside
+
+**Five subjects, 72 lessons, ~340 authored exercises.**
+
+| Subject | Units | Covers |
+|---------|-------|--------|
+| Coding | 8 | print, variables, strings, logic, lists and loops, functions, dicts/sets/tuples, classes and errors |
+| Mathematics | 2 | fractions, powers, equations, angles, area and volume, averages and probability |
+| Physics | 2 | speed and acceleration, forces, projectiles, energy, circuits, heat and waves |
+| Chemistry | 2 | atomic structure, periodic table, bonding, reactions, acids and bases, states and mixtures |
+| Biology | 2 | cells, body systems, plants, DNA and inheritance, evolution, ecosystems |
+
+Each unit ends with a generated **Unit Review** that resamples everything in that unit.
+
+## Engaging and educational gameplay
+
+Lessons are short tap-through sessions built from seven exercise types, so the interaction changes
+every screen:
+
+- **Multiple choice** and **predict-the-output** — options are shuffled on every render.
+- **Fill the blank** — tap words from a bank into gaps in a formula or snippet.
+- **Numeric answer** — typed values checked against a tolerance, used across maths and science.
+- **Type the answer** — free text, normalised before comparison.
+- **Order the lines** — assemble a working program, a method, or a food chain, by tapping *or* by
+  dragging rows between the pool and your answer and reordering them in place.
+- **Match pairs** — connect terms to meanings.
+- **Click the bug** — a short program is shown line by line; click the line that carries the fault.
+  It is the same skill the Debug Duel tests, introduced gently.
+- **Write code** — a real editor whose program is executed by the local Python interpreter and whose
+  stdout is compared with the expected output.
+
+The coding track is laid out as five themed worlds from the pitch — **Syntax Sands, Logic Lagoon,
+Structure Steppes, Algorithm Ascent, Architect's Apex** — each with a progress ring over the lessons it
+contains.
+
+**Game feel.** Every correct answer fires a particle burst, a floating `+XP` number that flies toward the
+counter, and a synthesised chime whose pitch climbs with your combo; a wrong answer shakes the screen,
+flashes red and plays a falling tone. Finishing a lesson drops confetti, a flawless run slams `FLAWLESS`
+across the screen, and duels open with a 3-2-1-FIGHT countdown and end on `VICTORY` confetti or a hard
+screen shake. No audio or image files ship with the app: every sound is generated with a Web Audio
+oscillator at play time and every effect is drawn on one overlay canvas. Sound and animation each have an
+off switch in Settings.
+
+**30 badges** unlock as you play — first lesson, flawless run, x2 combo, ten speed bonuses, a seven-day
+streak, a lesson in every subject, every lab cleared, a Debug Duel win, Diamond tier, beating an opponent
+rated 200 points above you, and more. Each is worth 20 gems and they are all listed, locked and unlocked,
+at the bottom of the Progress tab.
+
+Game mechanics: five hearts (one lost per miss, refilled next day or for 100 gems), three crowns per
+lesson, gems, a daily XP goal and a day streak. XP per answer is live-multiplied by a **combo**: three
+correct in a row gives x1.2, five gives x1.5, eight gives x2, and any wrong answer resets it. Answering
+in under eight seconds adds a **speed bonus**. Both are shown in the lesson header as they change, and
+summarised on the completion screen. A missed question is pushed back into the queue, so no lesson ends
+until everything in it has been answered correctly at least once.
+
+## Ranked Arena — the competitive layer
+
+`Arena` tab. Skill-matched 1v1 duels with a real rating system.
+
+- **Glicko-2 rating**, implemented in full (rating, deviation, volatility, Illinois root-finding for σ′).
+  Verified against Glickman's published worked example: 1500/200 vs three opponents returns
+  **1464.05 / 151.52 / 0.059996** against the paper's 1464.06 / 151.52 / 0.05999.
+- **Server-authoritative by design.** All rating maths, problem selection and code judging run in the
+  Electron main process (`arena-engine.js`, `arena-problems.js`). The duel screen never sees the hidden
+  tests, never decides a winner and never computes a rating — it submits and displays. Slide 4's
+  architecture principle holds inside a desktop app.
+- **Placement**: the first five duels are placements; your rating is hidden until they are done.
+- **Matchmaking**: the queue starts at a ±60 rating window and widens by 40 every 0.6 s up to ±400, so
+  fair pairing comes first and the wait stays bounded. The widening band is shown live while searching.
+- **Percentile tiers**: Bronze → Silver → Gold → Platinum → Diamond → Master → Grandmaster, cut as
+  percentages of the live 150-player ladder and recomputed on every open, so tiers cannot inflate.
+- **Seasons**: 14 days, then a soft reset that pulls every rating halfway back to 1500 and widens its
+  deviation.
+- **Three modes**:
+  - **Debug Duel** — a working function has been broken; run the hidden tests as often as you like, but
+    only a submission ends the duel. 12 problems, each verified so the shipped code fails and a correct fix passes.
+  - **1-Shot Vibecode Duel** — read the spec, write the function, submit exactly once. No test runs,
+    no retry. 10 problems.
+  - **Rapid STEM Duel** — six questions drawn from every subject, 20 s each, scored against the opponent.
+- **Opponent model**: opponents are simulated from the ladder, not networked. Their solve time and
+  success chance come from their rating and the problem's difficulty, and their progress bar ticks in
+  real time during the duel. This is the one place the app is honest about not having a backend.
+
+## Codex — the collection layer
+
+`Codex` tab. A summoning and team-battle system whose only currency is gems earned by studying.
+
+- **33 original spirits**, each personifying an idea from the course — Nullwyrm the undefined,
+  Recursa who calls herself, Primearch the indivisible, Entrope who only increases. Every one has lore
+  and a skill line that restates the concept, so a pull doubles as revision. Nothing is borrowed from
+  another game: the artwork is **procedural SVG**, generated from each character's palette, form and
+  feature list, so the app ships no image files.
+- **Summoning** costs 60 gems for one or 540 for ten. Rates are 2% for five star, 13% for four star,
+  and pity is real: a four star at least every 10 pulls and a guaranteed five star at 40. Duplicates
+  awaken a spirit for +8% power up to six times and refund gems.
+- **Teams of three** in lanes. Subject synergy pays: three of one discipline is +20%, three different
+  ones +12%. Class is a cycle — Attack beats Tech, Tech beats Guard, Guard beats Attack — worth 25% in
+  a lane, so the *order* you place them in is the real decision.
+- **Lane battles** resolve one lane at a time against a rival team scaled to your own strength. Win two
+  of three and you take one of their spirits, preferring one you do not own yet.
+- **Focus tickets** are the bridge back to learning: one per lesson completed and one per lab challenge
+  cleared, capped at ten, and each battle costs one. Your team also grants a **lesson XP bonus** of up to
+  25%, so the collection makes studying faster and studying is the only thing that grows the collection.
+- Rolls, team power, opponent generation, battle resolution and the prize are all decided in the main
+  process, exactly like the duel rating.
+
+## Real-time progress tracking and feedback
+
+- **Instant feedback**: every answer is marked the moment you submit it, with the correct answer and a
+  written explanation of *why* — not just right or wrong.
+- **Live in-lesson readout**: the header carries a running accuracy percentage and XP counter that update
+  after each question.
+- **Progress dashboard** (`Progress` tab): total XP, day streak, answers given, time on task, active days
+  and labs cleared; a 14-day XP bar chart; an accuracy donut; per-subject mastery bars with accuracy and
+  minutes; and a **Needs another look** list of every topic below 85% mastery with a one-click *Practise*
+  button.
+- **Coaching after each lesson**: the completion screen names your weakest topic, links straight to
+  practising it, and suggests a lab that demonstrates what you just learned.
+- **Export**: a JSON snapshot or a per-topic CSV table for a teacher, written wherever you choose.
+
+## Integration with virtual labs
+
+Six labs (`Virtual Labs` tab). Each is a live simulation — move a control and the underlying maths is
+recomputed and redrawn immediately, with challenges checked continuously and paid in XP. Labs never
+cost hearts, so experimenting is free.
+
+| Lab | Subject | What it simulates |
+|-----|---------|-------------------|
+| Circuit Bench | Physics | Two resistors in series or parallel; live Ohm law, per-component voltage, power and animated charge flow |
+| Projectile Range | Physics | Trajectory, range, peak height and flight time under Earth, Moon or Mars gravity, with a target to hit |
+| Titration Bench | Chemistry | 50 mL of acid titrated with alkali; real pH calculation, indicator colour and a live titration curve |
+| Quadratic Grapher | Mathematics | y = ax² + bx + c with roots, discriminant and vertex, plus a mystery curve to match |
+| Punnett Square | Biology | Crosses two genotypes and reports genotype and phenotype ratios |
+| Python Sandbox | Coding | A free editor wired to the local interpreter; output is matched against four open challenges |
+
+## SDG alignment
+
+The `Impact` tab states the alignment inside the app, tied to features you can open:
+
+- **SDG 4 — Quality education.** Five subjects across 72 lessons, every answer explained immediately,
+  per-topic mastery tracked and weak topics resurfaced for repractice.
+- **SDG 9 — Industry, innovation and infrastructure.** Six virtual labs stand in for equipment a school
+  may not own, and the coding track builds the skills the goal asks countries to grow.
+- **SDG 10 — Reduced inequalities.** No account, no subscription, no telemetry and no network calls;
+  progress is a local file the learner owns and can export. Accessibility settings scale text to 130%,
+  offer a high-contrast palette, and reduce animation.
+
+## Keyboard
+
+`1`–`9` pick an option or word chip, `Enter` checks and continues, `Esc` quits the lesson,
+`Tab` inserts four spaces in any code editor, `Ctrl+Enter` runs code.
+
+## Layout
+
+```
+main.js              Electron main: window, storage, Python runner, arena IPC, report export
+arena-engine.js      authority: Glicko-2, percentile tiers, ladder, matchmaking, opponent model, seasons
+arena-problems.js    duel problems, the hidden test harness, and the client-safe view of a problem
+preload.js           contextBridge API exposed to the renderer
+src/index.html       shell markup and nav
+src/styles.css       all styling, including high-contrast and reduced-motion modes
+src/app.js           renderer: routing, worlds path, lesson engine, labs shell, dashboard, SDG page
+src/arena-ui.js      renderer: rank card, queue, the three duel screens, leaderboard
+src/labs.js          the six simulations: parameters, physics/chemistry/maths, drawing, challenges
+gacha-engine.js      Codex roster, pull rates with pity, team power, lane battle resolution
+src/codex-ui.js      renderer: summon banner, reveal, collection, team builder, lane battles
+src/gacha-art.js     procedural SVG portraits, drawn from each character's own parameters
+src/juice.js         synthesised sound, particles, floating numbers, shakes and slams
+src/achievements.js  the 30 badges, each a pure predicate over saved state
+src/course/          content, one file per subject, plus an index that adds unit reviews and worlds
+scripts/verify.js    the content gate run by CI before any build
+scripts/make-icon.js draws build/icon.png from scratch and encodes the PNG by hand
+```
+
+Progress is stored as JSON in Electron's `userData` directory and can be wiped from Settings.
+
+## Notes on running code
+
+Python is located once at startup by trying `py -3`, `python`, then `python3`. Programs run in a temporary
+directory with a six-second timeout and their output is captured. There is no sandbox — an exercise runs
+whatever you type under your own user account, the same as running a script yourself. If no interpreter is
+found, code exercises are skipped automatically and the sandbox lab says so.

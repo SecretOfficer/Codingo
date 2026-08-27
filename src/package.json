@@ -1,0 +1,4 @@
+{
+  "//": "Marks everything under src/ as ES modules for Node's resolver. The browser already loads these with <script type=module>; this only matters when tooling such as scripts/verify.js imports them.",
+  "type": "module"
+}
